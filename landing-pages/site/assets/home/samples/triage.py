@@ -1,0 +1,49 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+from typing import Literal
+
+from pydantic import BaseModel
+
+from airflow.providers.standard.operators.hitl import ApprovalOperator
+from airflow.sdk import Param, dag, task
+
+
+class Triage(BaseModel):
+    severity: Literal["low", "high"]
+    summary: str
+
+
+@dag(params={"ticket": Param("", type="string")})
+def support_triage():
+    @task.llm(
+        llm_conn_id="pydanticai_default",
+        output_type=Triage,
+        system_prompt="Triage this support ticket.",
+    )
+    def triage(ticket: str):
+        return f"Ticket: {ticket}"
+
+    review = ApprovalOperator(
+        task_id="review",
+        subject="Escalate this ticket?",
+    )
+
+    triage("{{ params.ticket }}") >> review
+
+
+support_triage()

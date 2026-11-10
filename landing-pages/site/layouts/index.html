@@ -16,108 +16,474 @@
  specific language governing permissions and limitations
  under the License.
 */}}
+{{- /* The home page is a standalone document: it does not use baseof.html, Docsy or Bootstrap. */ -}}
+{{- $release := .Params.release -}}
+{{- $providers := (index (where .Params.stats.items "key" "providers") 0).value -}}
+{{- $docs := "/docs/apache-airflow/stable/" -}}
+{{- $start := printf "%sstart.html" $docs -}}
+{{- $upgrade := printf "%sinstallation/upgrading_to_airflow3.html" $docs -}}
+{{- $menu := slice -}}
+{{- /* Same links and new-tab rule as the site navbar (partials/navbar.html). */ -}}
+{{- range .Site.Menus.main -}}
+  {{- $href := .URL | relLangURL -}}
+  {{- with .Page }}{{ $href = .RelPermalink }}{{ end -}}
+  {{- $external := ne (urls.Parse .URL).Host (urls.Parse $.Site.Params.Baseurl).Host -}}
+  {{- $menu = $menu | append (dict "name" .Name "href" $href "external" $external) -}}
+{{- end -}}
+{{- /* Code samples are real files, parsed by Airflow in review; the license header the repo requires is cut before display. */ -}}
+{{- $hl := "linenos=inline,lineNumbersInTable=false,noClasses=false" -}}
+{{- $sample := dict -}}
+{{- range resources.Match "home/samples/*" -}}
+  {{- $sample = merge $sample (dict (path.Base .Name) (replaceRE "(?s)\\A(?:(?:#|//)[^\\n]*\\n)+\\n" "" .Content)) -}}
+{{- end -}}
+{{- $arrow := `<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9.5M8.5 4l4 4-4 4"/></svg>` | safeHTML -}}
+{{- $copyIcons := `<svg class="i cp-i" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/></svg><svg class="i ok-i" viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7"/></svg>` | safeHTML -}}
+{{- $halves := `<div class="half l"><div class="strip"></div></div><div class="half r"><div class="strip"></div></div>` | safeHTML -}}
+{{- $css := resources.Get "scss/home/home.scss" | toCSS (dict "enableSourceMap" hugo.IsServer) -}}
+{{- $js := resources.Get "js/home.js" -}}
+{{- if hugo.IsProduction }}{{ $css = $css | postCSS | minify | fingerprint }}{{ $js = $js | minify | fingerprint }}{{ end -}}
+<!doctype html>
+<html lang="{{ .Site.Language.Lang }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ .Site.Title }}</title>
+{{/* The site's theme script, inlined so the theme is set before first paint. */}}
+<script>document.documentElement.classList.add('js');{{ (resources.Get "js/dark-mode.js" | minify).Content | safeJS }}</script>
+{{ partial "head-meta.html" . }}
+<link rel="preload" href="{{ "home/fonts/InstrumentSans-normal-400_700.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ "home/fonts/JetBrainsMono-normal-400_600.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{ $css.RelPermalink }}"{{ with $css.Data.Integrity }} integrity="{{ . }}"{{ end }}>
+<script type="application/ld+json">
+{{ dict
+  "@context" "https://schema.org"
+  "@type" "SoftwareApplication"
+  "name" "Apache Airflow"
+  "softwareVersion" $release.version
+  "applicationCategory" "DeveloperApplication"
+  "operatingSystem" "Linux"
+  "softwareRequirements" (printf "Python %s" $release.python)
+  "license" "https://www.apache.org/licenses/LICENSE-2.0"
+  "url" "https://airflow.apache.org/"
+  "downloadUrl" "https://pypi.org/project/apache-airflow/"
+  "description" .Description
+  "publisher" (dict "@type" "Organization" "name" "The Apache Software Foundation" "url" "https://www.apache.org/")
+  "offers" (dict "@type" "Offer" "price" "0" "priceCurrency" "USD")
+  | jsonify | safeJS }}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
 
-{{ define "animation-header" }}
-    <section id="header">
-        <div id="header-canvas">
-            <div class="text-area">
-                <h1 class="text-area--header" id="header-title">Apache Airflow&#174;</h1>
-                <p class="text-area--subheader" id="header-lead">
-                    Apache Airflow&#174; is a platform created by the community to programmatically author, schedule and monitor
-                    workflows.
-                </p>
-                <a href="/docs/stable/start.html" id="header-button">
-                    {{ partial "buttons/button-filled" (dict "text" "Install Airflow") }}
-                </a>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="{{ .Site.Home.RelPermalink }}" aria-label="Apache Airflow home">{{ with resources.Get "icons/airflow-logo.svg" }}{{ .Content | safeHTML }}{{ end }}</a>
+    <nav aria-label="Main">
+      <ul class="menu">
+        {{- range $menu }}
+        <li><a href="{{ .href }}"{{ if .external }} target="_blank"{{ end }}>{{ .name }}</a></li>
+        {{- end }}
+      </ul>
+    </nav>
+    <div class="nav-right">
+      <div class="seg theme" role="group" aria-label="Color theme">
+        <button type="button" class="theme-toggle-pill__btn" data-theme-value="light" aria-pressed="false" aria-label="Light theme"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M3.4 12.6l1-1M11.6 4.4l1-1"/></svg></button>
+        <button type="button" class="theme-toggle-pill__btn" data-theme-value="dark" aria-pressed="false" aria-label="Dark theme"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.6A5.5 5.5 0 0 1 6.4 2.5a5.5 5.5 0 1 0 7.1 7.1Z"/></svg></button>
+      </div>
+      <a class="gh" href="https://github.com/apache/airflow" aria-label="Apache Airflow on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></a>
+      <a class="btn btn-primary btn-sm nav-cta" href="{{ $start }}">Get started</a>
+      <details class="mnav">
+        <summary aria-label="Menu"><svg class="i b" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/></svg><svg class="i x" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg></summary>
+        <div class="mnav-panel">
+          {{- range $menu }}
+          <a href="{{ .href }}"{{ if .external }} target="_blank"{{ end }}>{{ .name }}</a>
+          {{- end }}
+          <a href="https://github.com/apache/airflow">GitHub</a>
+          <a class="btn btn-primary" href="{{ $start }}">Get started</a>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<section class="hero" aria-labelledby="hero-h">
+  <div class="art" aria-hidden="true">{{ $halves }}</div>
+  <div class="horizon" aria-hidden="true"><div class="hz">{{ $halves }}</div></div>
+  <div class="wrap">
+    <a class="pill rv" style="--i:0" href="{{ $release.blog | relURL }}"><span class="badge">Airflow {{ $release.short }}</span><span class="pd">{{ $release.highlights }}</span><span class="pm">What's new</span>{{ $arrow }}</a>
+    <h1 id="hero-h"><span>Orchestrate data and AI</span> <span>workflows as code</span></h1>
+    <p class="lead sub rv" style="--i:1">Apache Airflow® is the open‑source platform to author, schedule and monitor workflows, built by the community at the Apache Software Foundation.</p>
+    <div class="ctas rv" style="--i:2">
+      <a class="btn btn-primary" href="{{ $start }}">Get started</a>
+      <a class="btn btn-secondary" href="{{ $upgrade }}">Upgrade from Airflow 2</a>
+    </div>
+    <div class="install rv" style="--i:3">
+      <div class="seg pmgr" role="group" aria-label="Package manager"><button type="button" aria-pressed="true" data-cmd="pip install apache-airflow">pip</button><button type="button" aria-pressed="false" data-cmd="uv pip install apache-airflow">uv</button></div>
+      <code><span class="pr">$</span><span id="icmd">pip install apache-airflow</span></code><button class="copy" type="button" data-copy-el="icmd" aria-label="Copy the install command">{{ $copyIcons }}</button>
+    </div>
+    <p class="hint rv" style="--i:4">For a reproducible install, pin dependencies with a <a class="ilink" href="{{ $docs }}installation/installing-from-pypi.html">constraints file</a>.</p>
+    <ul class="chips rv" style="--i:5" aria-label="At a glance">
+      <li>Open source</li><li>Python</li><li>{{ $providers }} providers</li><li>Event-driven</li><li>Self-hosted or managed</li>
+    </ul>
+  </div>
+  <button class="artctl" type="button" aria-pressed="false" aria-label="Pause the background animation"><svg class="i pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 3.5v9M10.5 3.5v9"/></svg><svg class="i play" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z"/></svg></button>
+</section>
+
+<section class="proof" aria-labelledby="proof-h">
+  <div class="wrap">
+    <h2 id="proof-h" class="label">Integrates with</h2>
+    <ul class="logos">
+      {{- range slice
+        (slice "aws" "AWS" 43) (slice "google-cloud" "Google Cloud" 32) (slice "azure" "Microsoft Azure" 34)
+        (slice "snowflake" "Snowflake" 26) (slice "databricks" "Databricks" 25) (slice "kubernetes" "Kubernetes" 27)
+        (slice "spark" "Apache Spark" 31) (slice "kafka" "Apache Kafka" 16) (slice "dbt-cloud" "dbt Cloud" 26)
+        (slice "postgres" "PostgreSQL" 25) (slice "iceberg" "Apache Iceberg" 26) (slice "slack" "Slack" 26) }}
+      <li><img src="{{ printf "home/img/logos/%s.png" (index . 0) | relURL }}" alt="" width="{{ index . 2 }}" height="26">{{ index . 1 }}</li>
+      {{- end }}
+    </ul>
+    <p class="more">Twelve of {{ $providers }} provider packages, shown to identify what they connect to; no endorsement implied. <a class="ilink" href="{{ "registry/" | relURL }}">Browse the Registry</a></p>
+  </div>
+</section>
+
+<section class="uc" id="use-cases" aria-labelledby="uc-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="uc-h">From nightly batch to AI agents</h2>
+      <p class="lead">One scheduler, one UI and one run history for every kind of workflow your teams run.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Use cases">
+      <button class="tab a-green" role="tab" id="t-data" aria-controls="p-data" aria-selected="true">Data pipelines</button>
+      <button class="tab a-teal" role="tab" id="t-ai" aria-controls="p-ai" aria-selected="false" tabindex="-1">AI and agents</button>
+      <button class="tab a-amber" role="tab" id="t-event" aria-controls="p-event" aria-selected="false" tabindex="-1">Event-driven</button>
+      <button class="tab a-red" role="tab" id="t-lang" aria-controls="p-lang" aria-selected="false" tabindex="-1">Any language</button>
+      <button class="tab a-blue" role="tab" id="t-ops" aria-controls="p-ops" aria-selected="false" tabindex="-1">Operations</button>
+    </div>
+
+    <div class="panels">
+      <div class="panel a-green" role="tabpanel" id="p-data" aria-labelledby="t-data" tabindex="0">
+        <div class="ptext">
+          <p class="k">Data pipelines</p>
+          <h3>Schedule on time, on data, or both</h3>
+          <p>Run a pipeline on a cron schedule, when the assets it reads are updated, or on a mix of the two. Retries, backfills and a history of every run come with the scheduler.</p>
+          <ul class="ticks">
+            <li>When one team's Dag updates an asset, the Dags that read it start</li>
+            <li>Backfill any date range from the UI, the REST API or the CLI</li>
+            <li>With a Git Dag bundle, each run keeps one version of the code, and the UI shows it</li>
+          </ul>
+          <a class="tlink" href="{{ $docs }}authoring-and-scheduling/asset-scheduling.html">Asset-aware scheduling {{ $arrow }}</a>
+        </div>
+        <div class="pwin glow">
+          <figure class="win" aria-label="Illustration: the Grid view of the daily_sales Dag">
+            <div class="wbar" aria-hidden="true"><img src="{{ "favicons/favicon-32x32.png" | relURL }}" alt="" width="18" height="18"><div class="crumb"><span class="c">Dags</span><span class="sep">/</span><b>daily_sales</b></div><span class="c hide-s">@daily</span><span class="wact"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z" fill="currentColor"/></svg>Trigger</span></div>
+            <div class="wtabs" aria-hidden="true"><span class="on">Grid</span><span>Graph</span><span>Code</span><span>Runs</span><span class="hide-s">Calendar</span></div>
+            <div class="wbody">
+              <div class="gv" role="img" aria-label="Fourteen daily runs of extract, validate, load and report. All succeeded except Nov 3, when load failed and report was marked upstream failed. Today's run is running load.">
+                <div class="gv-names"><span></span><span>extract</span><span>validate</span><span>load</span><span>report</span></div>
+                <div class="gv-cols">
+                  {{- range slice
+                    (slice "Oct 28" 34) (slice "Oct 29" 38) (slice "Oct 30" 31) (slice "Oct 31" 36) (slice "Nov 1" 40)
+                    (slice "Nov 2" 33) (slice "Nov 3" 52) (slice "Nov 4" 37) (slice "Nov 5" 35) (slice "Nov 6" 34)
+                    (slice "Nov 7" 39) (slice "Nov 8" 36) (slice "Nov 9" 33) (slice "Today" 22) }}
+                  {{- $day := index . 0 }}
+                  {{- $load := index (dict "Nov 3" "fail" "Today" "run") $day | default "ok" }}
+                  {{- $report := index (dict "fail" "upfail" "run" "none") $load | default "ok" }}
+                  <span class="gcol{{ if eq $load "run" }} sel{{ end }}" title="{{ $day }}"><i class="bar {{ $load }}" style="height:{{ index . 1 }}px"></i><i class="sq ok"></i><i class="sq ok"></i><i class="sq {{ $load }}"></i><i class="sq {{ $report }}"></i></span>
+                  {{- end }}
+                </div>
+              </div>
+              <div class="notes">
+                <div class="note"><b><i class="sq fail"></i>Nov 3 · load failed</b>It failed after three retries, so report was marked upstream failed. Clear the task to run it again from there.</div>
+                <div class="note"><b><i class="sq run"></i>Today · running</b>load is running. report starts when it succeeds.</div>
+              </div>
             </div>
+            <figcaption class="wfoot"><span>The Grid view: one column per run, one row per task.</span><span class="illu">Illustration</span></figcaption>
+          </figure>
         </div>
-    </section>
-{{ end }}
+      </div>
 
-{{ define "main" }}
-    <div>
-        <h2 class="page-header home-section-header">Principles</h2>
-        <div class="text-with-icon-list">
-            {{ partial "text-with-icon" (dict "logo_path" "icons/scalable-icon.svg" "header" "Scalable" "text" "Apache Airflow&#174; has a modular architecture and uses a message queue to orchestrate an arbitrary number of workers. Airflow™ is ready to scale to infinity.") }}
-            {{ partial "text-with-icon" (dict "logo_path" "icons/dynamic-icon.svg" "header" "Dynamic" "text" "Apache Airflow&#174; pipelines are defined in Python, allowing for dynamic pipeline generation. This allows for writing code that instantiates pipelines dynamically.") }}
-            {{ partial "text-with-icon" (dict "logo_path" "icons/extensible-icon.svg" "header" "Extensible" "text" "Easily define your own operators and extend libraries to fit the level of abstraction that suits your environment.") }}
-            {{ partial "text-with-icon" (dict "logo_path" "icons/elegant-icon.svg" "header" "Elegant" "text" "Apache Airflow&#174; pipelines are lean and explicit. Parametrization is built into its core using the powerful Jinja templating engine.") }}
+      <div class="panel a-teal" role="tabpanel" id="p-ai" aria-labelledby="t-ai" tabindex="0">
+        <div class="ptext">
+          <p class="k">AI and agents</p>
+          <h3>Run LLM calls and agents as tasks</h3>
+          <p>The Common AI provider turns a model call or a tool-using agent into an ordinary task, with connections, retries, logs and run history like any other. Human-in-the-loop operators hold a task until a person decides.</p>
+          <ul class="ticks">
+            <li><code>@task.llm</code> returns output validated against a Pydantic model</li>
+            <li><code>@task.agent</code> gives an agent toolsets; with <code>durable=True</code>, a retry replays the model and tool calls that already finished instead of running them again</li>
+            <li><code>ApprovalOperator</code> waits for a person to approve or reject in the UI</li>
+          </ul>
+          <a class="tlink" href="{{ "docs/apache-airflow-providers-common-ai/stable/index.html" | relURL }}">Common AI provider {{ $arrow }}</a>
         </div>
-    </div>
-    <div>
-        <h2 class="page-header home-section-header">Features</h2>
-        <div class="features-list">
-            {{ partial "feature" (dict "logo_path" "icons/pure-python-icon.svg" "header" "Pure Python" "text" "No more command-line or XML black-magic! Use standard Python features to create your workflows, including date time formats for scheduling and loops to dynamically generate tasks. This allows you to maintain full flexibility when building your workflows.") }}
-            {{ partial "feature" (dict "logo_path" "icons/useful-ui-icon.svg" "header" "Useful UI" "text" "Monitor, schedule and manage your workflows via a robust and modern web application. No need to learn old, cron-like interfaces. You always have full insight into the status and logs of completed and ongoing tasks.") }}
-            {{ partial "feature" (dict "logo_path" "icons/integrations-icon.svg" "header" "Robust Integrations" "text" "Apache Airflow® provides many plug-and-play operators that are ready to execute your tasks on Google Cloud Platform, Amazon Web Services, Microsoft Azure and many other third-party services. This makes Airflow easy to apply to current infrastructure and extend to next-gen technologies.") }}
-            {{ partial "feature" (dict "logo_path" "icons/easy-use-icon.svg" "header" "Easy to Use" "text" "Anyone with Python knowledge can deploy a workflow. Apache Airflow® does not limit the scope of your pipelines; you can use it to build ML models, transfer data, manage your infrastructure, and more.") }}
-            {{ partial "feature" (dict "logo_path" "icons/open-source-icon.svg" "header" "Open Source" "text" "Wherever you want to share your improvement you can do this by opening a PR. It’s simple as that, no barriers, no prolonged procedures. Airflow has many active users who willingly share their experiences. Have any questions? Check out our buzzing slack.") }}
+        {{ partial "home/code-window.html" (dict
+          "label" "Example code: a Dag that triages a support ticket with an LLM, then waits for approval"
+          "dag" "support_triage" "tag" "@task.llm"
+          "code" (highlight (index $sample "triage.py") "python" (printf "%s,hl_lines=16-22" $hl))
+          "caption" "<code>@task.llm</code> sends the returned prompt to the model on the connection and returns a <code>Triage</code>.") }}
+      </div>
+
+      <div class="panel a-amber" role="tabpanel" id="p-event" aria-labelledby="t-event" tabindex="0">
+        <div class="ptext">
+          <p class="k">Event-driven</p>
+          <h3>Start a run when an event arrives</h3>
+          <p>An asset watcher listens to a message queue from the triggerer and starts a Dag run when a message arrives. No sensor holds a worker slot while it waits.</p>
+          <ul class="ticks">
+            <li><code>MessageQueueTrigger</code> reads from Apache Kafka, Amazon SQS, Redis and more</li>
+            <li>Deferrable operators wait in the triggerer too, so waiting costs no worker slot</li>
+            <li>Since 3.4, a Dag scheduled on one asset starts a run for each event by default</li>
+          </ul>
+          <a class="tlink" href="{{ $docs }}authoring-and-scheduling/event-scheduling.html">Event-driven scheduling {{ $arrow }}</a>
         </div>
+        {{ partial "home/code-window.html" (dict
+          "label" "Example code: a Dag that runs for each message on a Kafka topic"
+          "dag" "process_order" "tag" "AssetWatcher"
+          "code" (highlight (index $sample "on_event.py") "python" (printf "%s,hl_lines=6-10" $hl))
+          "caption" "Each message on the <code>orders</code> topic starts a run of <code>process_order</code>.") }}
+      </div>
 
-    </div>
-    <div>
-        <h2 class="page-header home-section-header">Integrations</h2>
-        <div id="integrations">
-            <script type="application/x-template" id="integration-template">
-                <a class="list-item" href="">
-                    <div class="card">
-                        <div class="box-event box-event__integration">
-                            <img src="" alt="" data-name="logo" class="box-event__integration--logo"/>
-                            <span class="box-event__integration--name" data-name="name"></span>
-                        </div>
-                    </div>
-                </a>
-            </script>
-            <form class="search-form" role="search" aria-label="Search integrations">
-                <label for="integrations-search" class="visually-hidden">Search integrations</label>
-                <input id="integrations-search" class="search-form__input" placeholder="Search" name="q" type="search" size="16" aria-label="Search integrations"/>
-                <button class="search-form__button" type="submit" aria-label="Search">
-                    {{ with resources.Get "icons/search-icon.svg" }}
-                    {{ .Content | safeHTML }}
-                    {{ end }}
-                </button>
-            </form>
-            <div id="integrations-container" class="list-items">
-                {{ range $elem_index, $elem_val := (.Site.Data.integrations) }}
-                {{ if lt $elem_index 8 }}
-                <a class="list-item" href="{{ $elem_val.url }}">
-                    {{ partial "boxes/integration" $elem_val }}
-                </a>
-                {{ end}}
-                {{ end }}
-            </div>
-            <div class="loading" style="display: none">Loading..</div>
-            <div class="show-more-button">
-                {{ partial "buttons/button-filled" (dict "text" "Show more" "id" "show-more-integration")}}
-            </div>
+      <div class="panel a-red" role="tabpanel" id="p-lang" aria-labelledby="t-lang" tabindex="0">
+        <div class="ptext">
+          <p class="k">Any language</p>
+          <h3>Write Dags and tasks in Go, Java or TypeScript</h3>
+          <p>Since Airflow 3, tasks talk to Airflow through the Task Execution API instead of its database. That made Task SDKs in other languages possible, and in 3.4 a whole Dag can be defined in one.</p>
+          <ul class="ticks">
+            <li>Go, Java and TypeScript SDKs, experimental in 3.4</li>
+            <li>A Python Dag can hand single tasks to another language</li>
+            <li>Dags in YAML, validated against a schema, also experimental</li>
+          </ul>
+          <a class="tlink" href="{{ $docs }}authoring-and-scheduling/language-sdks/index.html">Non-Python Task SDKs {{ $arrow }}</a>
         </div>
+        {{ partial "home/code-window.html" (dict
+          "label" "Example code: a Dag written in Go"
+          "file" "main.go" "tag" "experimental"
+          "code" (highlight (index $sample "main.go") "go" (printf "%s,hl_lines=19-25" $hl))
+          "caption" "A Go Dag with two tasks, from the Go SDK guide.") }}
+      </div>
+
+      <div class="panel a-blue" role="tabpanel" id="p-ops" aria-labelledby="t-ops" tabindex="0">
+        <div class="ptext">
+          <p class="k">Operations</p>
+          <h3>Know when a run is late, not only when it fails</h3>
+          <p>A deadline alert, still experimental, calls you when a run hasn't finished in time. The audit log records who triggered, cleared or paused what.</p>
+          <ul class="ticks">
+            <li>Deadlines count from when a run was queued, its logical date, a fixed time or its average runtime</li>
+            <li>Pause a Dag gracefully, letting its active runs finish first</li>
+            <li>Multi-team deployments, experimental: each team gets its own Dag bundles, connections and executors</li>
+          </ul>
+          <a class="tlink" href="{{ $docs }}howto/deadline-alerts.html">Deadline alerts {{ $arrow }}</a>
+        </div>
+        {{ partial "home/code-window.html" (dict
+          "label" "Example code: a Dag that posts to Slack when a run misses its deadline"
+          "dag" "nightly_finance" "tag" "DeadlineAlert"
+          "code" (highlight (index $sample "deadline.py") "python" (printf "%s,hl_lines=15-25" $hl))
+          "caption" "If a run hasn't finished an hour after it was queued, Slack gets a message.") }}
+      </div>
     </div>
-    <div>
-    <h2 class="page-header home-section-header">From the Blog</h2>
+  </div>
+</section>
 
-    <div class="blog-snippet-list">
-        {{ range first 3 (where .Site.RegularPages "Section" "blog") }}
-        <article class="blog-snippet-item">
-            <time datetime="{{ .Date }}">
-                {{ .Date.Format "Jan 2, 2006" }}
-            </time>
+<section class="write" id="write" aria-labelledby="write-h">
+  <div class="wrap grid12">
+    <div class="wtext">
+      <h2 id="write-h">Write Dags in plain Python</h2>
+      <p class="lead">A Dag is a Python function, and each task is a function inside it. Return values pass between tasks, and an asset links one Dag to the Dags that read its output.</p>
+      <ol class="points">
+        <li><span class="n">01</span><div><b>Tasks are functions</b><p><code>@task</code> turns a function into a task with retries, logs and a history of every run.</p></div></li>
+        <li><span class="n">02</span><div><b>Schedule on time or on data</b><p><code>ingest_orders</code> runs daily. Its <code>load</code> task updates the <code>orders</code> asset, which starts <code>orders_report</code>.</p></div></li>
+        <li><span class="n">03</span><div><b>Test it on your laptop</b><p><code>airflow dags test</code> runs a Dag in one process, with no scheduler or workers.</p></div></li>
+      </ol>
+      <p class="fast"><b>Upgrading from Airflow 2?</b> Ruff's <code>AIR301</code> and <code>AIR302</code> rules find the breaking changes in your Dags and fix many of them. <a class="ilink" href="{{ $upgrade }}">Read the upgrade guide</a></p>
+    </div>
+    <div class="wcode glow">
+      <div class="win">
+        <div class="etabs">
+          <div class="etl" role="tablist" aria-label="Example files">
+            <button class="etab" role="tab" id="e-code" aria-controls="ep-code" aria-selected="true"><span class="py" aria-hidden="true"></span>orders.py</button>
+            <button class="etab" role="tab" id="e-run" aria-controls="ep-run" aria-selected="false" tabindex="-1">output</button>
+          </div>
+          <button class="copy" type="button" data-copy-code="orders-src" aria-label="Copy orders.py">{{ $copyIcons }}<span class="hide-s">Copy</span></button>
+        </div>
+        <div class="epane" id="ep-code" role="tabpanel" aria-labelledby="e-code">
+          <div class="code" id="orders-src">{{ highlight (index $sample "orders.py") "python" $hl }}</div>
+        </div>
+        <div class="epane" id="ep-run" role="tabpanel" aria-labelledby="e-run" hidden>
+          <div class="term">
+<div class="cmd">airflow dags test ingest_orders 2026-11-09</div>
+<div class="dim-t">[info] Pushing xcom  ti=RuntimeTaskInstance(… task_id='extract' …)</div>
+<div class="dim-t">[info] Task instance state updated  … <span class="ok-t">new_state=success</span></div>
+<div>Loaded 2 orders</div>
+<div class="dim-t">[info] Pushing xcom  ti=RuntimeTaskInstance(… task_id='load' …)</div>
+<div class="dim-t">[info] Task instance state updated  … <span class="ok-t">new_state=success</span></div>
+<div class="dim-t">[info] DagRun Finished: dag_id=ingest_orders, … <span class="ok-t">state=success</span></div>
+          </div>
+          <p class="enote">Output of a real run, trimmed: timestamps, IDs and some log lines are cut (…).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-            <h3 class="blog-snippet-title">
-                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-            </h3>
-
-            <p class="blog-snippet-excerpt">
-                {{ .Summary | plainify | truncate 140 }}
-            </p>
-        </article>
-        {{ end }}
+<section class="ui" id="ui" aria-labelledby="ui-h">
+  <div class="wrap">
+    <div class="grid12 up-grid">
+      <div class="up-text">
+        <h2 id="ui-h">Every run, in one UI</h2>
+        <p class="lead">The Grid view shows each Dag's runs side by side, with logs, graph, code and calendar a click away. The UI comes in light and dark themes, in English and 20 other languages.</p>
+        <a class="tlink" href="{{ $docs }}ui.html">Tour the UI {{ $arrow }}</a>
+      </div>
+      <figure class="browser glow">
+        <div class="win">
+          <div class="wbar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="addr"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="7" width="9" height="6.5" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>localhost:8080</span><span class="hide-s spacer"></span></div>
+          <div class="shot">
+            <img class="only-light" src="{{ "home/img/ui-grid-light.webp" | relURL }}" alt="The Airflow 3 Grid view: a bar per run and a column of task squares, green for success and red for failed, beside the Dag's overview" width="1200" height="730" loading="lazy">
+            <img class="only-dark" src="{{ "home/img/ui-grid-dark.webp" | relURL }}" alt="The Airflow 3 Grid view: a bar per run and a column of task squares, green for success and red for failed, beside the Dag's overview" width="1200" height="730" loading="lazy">
+          </div>
+        </div>
+        <figcaption class="cap">The Grid view in Airflow 3, from the Airflow documentation.</figcaption>
+      </figure>
     </div>
 
-    <div class="show-more-button">
-    <a href="/blog/">
-        {{ partial "buttons/button-filled" (dict "text" "Visit the Blog" "id" "visit-blog-button") }}
-    </a>
-</div>
-</div>
+    <h2 class="sr">Questions</h2>
+    <div class="faq">
+      <div>
+        <h3 class="label">Upgrading from Airflow 2</h3>
+        <details><summary>Is Airflow 2 still supported?</summary><p>No. Airflow 2 reached end of life on 22 April 2026 and gets no more fixes, security fixes included. See <a class="ilink" href="{{ $docs }}installation/supported-versions.html">supported versions</a>.</p></details>
+        <details><summary>Do I have to rewrite my Dags?</summary><p>Often only the imports change. Ruff's <code>AIR301</code> and <code>AIR302</code> rules flag breaking changes, such as operators that moved to provider packages, and <code>ruff check dags/ --select AIR301,AIR302 --fix</code> fixes many of them. <code>AIR311</code> and <code>AIR312</code> flag recommended updates, such as importing <code>dag</code> and <code>task</code> from <code>airflow.sdk</code>. The <a class="ilink" href="{{ $upgrade }}">upgrade guide</a> covers the rest.</p></details>
+        <details><summary>What changed in Airflow 3?</summary><p>A new React UI, the Task Execution API that lets tasks run anywhere, Dag versioning, backfills run by the scheduler, and event-driven scheduling with assets. The <a class="ilink" href="{{ $docs }}release_notes.html">release notes</a> list every change since.</p></details>
+      </div>
+      <div>
+        <h3 class="label">Running Airflow</h3>
+        <details><summary>Which Python versions are supported?</summary><p>Airflow {{ $release.short }} supports Python {{ $release.python }}. Run it on Linux in production; macOS, and Windows through WSL2, are fine for development.</p></details>
+        <details><summary>How do I run it in production?</summary><p>With the official Docker image, the Helm chart for Kubernetes, or a pip install pinned with a constraints file. See <a class="ilink" href="{{ $docs }}administration-and-deployment/production-deployment.html">production deployment</a>.</p></details>
+        <details><summary>Is it free?</summary><p>Yes. Apache Airflow is free and open source under the Apache License 2.0. If you'd rather not run it yourself, several companies offer managed services; see the <a class="ilink" href="{{ "ecosystem/" | relURL }}">ecosystem page</a>.</p></details>
+      </div>
+    </div>
+  </div>
+</section>
 
-{{ end }}
+<section class="inside" id="inside" aria-labelledby="in-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="in-h">What's inside</h2>
+      <p class="lead">An API server, a scheduler, a Dag processor and a triggerer around one metadata database. Workers run tasks wherever they fit and report back through the Task Execution API.</p>
+    </div>
+    <div class="grid12">
+      <div class="dia" role="img" aria-label="Architecture: work comes from Dag bundles, from schedules and events, and from people and tools using the UI, REST API and CLI. The control plane is the Dag processor, scheduler, triggerer and API server around the metadata database. Tasks run on Celery, Kubernetes, Edge workers or AWS, and talk to the API server through the Task Execution API.">
+        <div class="layer"><span class="lab label">Work comes from</span>
+          <div class="nodes n3"><div class="node"><b>Dag bundles</b>Python, Go, Java, TypeScript or YAML, from Git, a folder or object storage</div><div class="node"><b>Schedules and events</b>cron, assets and message queues</div><div class="node"><b>People and tools</b>UI, REST API, CLI and <code>airflowctl</code></div></div></div>
+        <div class="wire"><div class="wl"><svg viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true"><path d="M50 0 C50 22 150 18 150 40 M150 0 V40 M250 0 C250 22 150 18 150 40"/></svg></div></div>
+        <div class="layer"><span class="lab label">Control plane</span>
+          <div class="engine">
+            <div class="packs"><div class="pk"><b>Dag processor</b>parses bundles</div><div class="pk"><b>Scheduler</b>decides what runs</div><div class="pk"><b>Triggerer</b>waits on events</div><div class="pk"><b>API server</b>UI, REST and Task Execution APIs</div></div>
+            <div class="core"><div class="node"><b>Metadata database</b>PostgreSQL or MySQL</div></div>
+          </div></div>
+        <div class="wire"><div class="wl"><svg viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><path d="M200 0 C200 22 50 18 50 40 M200 0 C200 22 150 18 150 40 M200 0 C200 22 250 18 250 40 M200 0 C200 22 350 18 350 40"/></svg><em>Task Execution API</em></div></div>
+        <div class="layer"><span class="lab label">Run tasks on</span>
+          <div class="nodes n4"><div class="node"><b>Celery</b>workers on queues</div><div class="node"><b>Kubernetes</b>a pod per task</div><div class="node"><b>Edge</b>remote workers over HTTP</div><div class="node"><b>AWS</b>ECS, Batch and Lambda executors</div></div></div>
+      </div>
+      <ul class="notesr">
+        <li><b><i class="sw-blue"></i>Workers need no database access</b><p>Task code on workers talks to Airflow through the Task Execution API, so workers can run without credentials for the metadata database.</p></li>
+        <li><b><i class="sw-green"></i>A version for every run</b><p>With a versioned Dag bundle such as Git, a run uses one version of the code from start to finish, and the UI shows that version's code and graph.</p></li>
+        <li><b><i class="sw-teal"></i>Waiting costs no worker slot</b><p>Deferred tasks and asset watchers wait in the triggerer.</p></li>
+        <li><b><i class="sw-red"></i>Several executors at once</b><p>Send each task to the executor that suits it, in one deployment, or write your own.</p></li>
+        <li><b><i class="sw-amber"></i>Built to extend</b><p>Provider packages, plugins with React views, custom executors and auth managers.</p></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="community" id="community" aria-labelledby="co-h">
+  <div class="wrap grid12">
+    <div class="ctext">
+      <h2 id="co-h">Built in the open, at the Apache Software Foundation</h2>
+      <p class="lead">The Apache Airflow software is free, open source under the Apache License 2.0, and built by its community. It started at Airbnb in 2014, open source from its first commit, and has been an Apache top-level project since 2019.</p>
+      <a class="tlink" href="{{ "community/" | relURL }}">Join the community {{ $arrow }}</a>
+    </div>
+    <ul class="clist">
+      {{- range slice
+        (slice "https://s.apache.org/airflow-slack" "Slack" "Ask and answer questions")
+        (slice "https://github.com/apache/airflow" "GitHub" "Code, issues and pull requests")
+        (slice "https://lists.apache.org/list.html?dev@airflow.apache.org" "Dev list" "Where the project's decisions are made")
+        (slice "https://github.com/apache/airflow/blob/main/contributing-docs/README.rst" "Contribute" "Your first pull request, step by step")
+        (slice "/meetups/" "Meetups" "Meet the community near you") }}
+      <li><a href="{{ index . 0 }}"><b>{{ index . 1 }}</b><span>{{ index . 2 }}</span>{{ $arrow }}</a></li>
+      {{- end }}
+    </ul>
+    <div class="stats">
+      {{- range .Params.stats.items }}
+      <a class="stat a-{{ .accent }}" href="{{ .url }}"><b>{{ .value }}</b><span>{{ .label }}</span></a>
+      {{- end }}
+      <p class="cap2">As of {{ .Params.stats.as_of }}, from GitHub, pypistats.org, the released providers and INTHEWILD.md.</p>
+    </div>
+  </div>
+</section>
+
+<section class="blog" aria-labelledby="blog-h">
+  <div class="wrap">
+    <div class="blog-head">
+      <h2 id="blog-h">From the blog</h2>
+      <a class="tlink" href="{{ "blog/" | relURL }}">All posts {{ $arrow }}</a>
+    </div>
+    <ul class="posts">
+      {{- range first 3 (where .Site.RegularPages "Section" "blog") }}
+      <li><a href="{{ .RelPermalink }}"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time><b>{{ .Title }}</b><span>{{ .Summary | plainify | truncate 140 }}</span></a></li>
+      {{- end }}
+    </ul>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="cta-h">
+  <div class="art" aria-hidden="true">{{ $halves }}</div>
+  <div class="wrap">
+    <div class="ccard">
+      <h2 id="cta-h">Run Airflow on your laptop</h2>
+      <p class="lead"><code>airflow standalone</code> starts every component on SQLite, so you can try Airflow and write Dags before you deploy.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="{{ $start }}">Get started</a>
+        <a class="btn btn-secondary" href="{{ "docs/" | relURL }}">Read the docs</a>
+      </div>
+      <div class="shell"><pre><span class="pr">$ </span>pip install apache-airflow
+<span class="pr">$ </span>airflow standalone</pre><button class="copy" type="button" data-copy="pip install apache-airflow&#10;airflow standalone" aria-label="Copy both commands">{{ $copyIcons }}</button></div>
+      <p class="hint">Then open <code>localhost:8080</code> and log in as <code>admin</code> with the password Airflow prints. <span class="nowrap">Python {{ $release.python }}</span>.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="fcols">
+      <div class="fbrand">
+        {{- /* Lazy images under display: none are never fetched, so only the current theme's logo loads. */}}
+        <img class="only-light" src="{{ "images/airflow-logo.svg" | relURL }}" alt="Apache Airflow" width="124" height="48" loading="lazy">
+        <img class="only-dark" src="{{ "images/airflow-logo-dark.svg" | relURL }}" alt="Apache Airflow" width="124" height="48" loading="lazy">
+        <p>A platform to author, schedule and monitor workflows. A project of the Apache Software Foundation.</p>
+      </div>
+      <nav class="fcol" aria-labelledby="f-project"><h2 id="f-project" class="label">Project</h2><ul>
+        {{- range $menu }}
+        <li><a href="{{ .href }}"{{ if .external }} target="_blank"{{ end }}>{{ .name }}</a></li>
+        {{- end }}
+      </ul></nav>
+      <nav class="fcol" aria-labelledby="f-elsewhere"><h2 id="f-elsewhere" class="label">Elsewhere</h2><ul>
+        {{- range .Site.Params.links.media }}
+        <li><a href="{{ .url }}">{{ .name }}</a></li>
+        {{- end }}
+      </ul></nav>
+      <nav class="fcol" aria-labelledby="f-asf"><h2 id="f-asf" class="label">The ASF</h2><ul>
+        <li><a href="https://www.apache.org/">Foundation</a></li>
+        {{- range .Site.Params.links.policies }}
+        <li><a href="{{ .url }}">{{ .name }}</a></li>
+        {{- end }}
+        <li><a href="https://www.apache.org/foundation/marks/">Trademarks</a></li>
+      </ul></nav>
+    </div>
+    <div class="legal">
+      <p>Copyright © {{ now.Format "2006" }} The Apache Software Foundation, licensed under the Apache License, Version 2.0. Apache Airflow, Airflow, Apache, Apache Iceberg, Apache Kafka, Apache Spark, the Apache feather logo and the Apache Airflow project logo are either registered trademarks or trademarks of The Apache Software Foundation in the United States and other countries. Other names and logos may be trademarks of their respective owners.</p>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="{{ $js.RelPermalink }}"{{ with $js.Data.Integrity }} integrity="{{ . }}"{{ end }} defer></script>
+</body>
+</html>
