@@ -21,8 +21,22 @@
   'use strict'
 
   const themeKey = 'theme'
-  const getStoredTheme = () => localStorage.getItem(themeKey)
-  const setStoredTheme = theme => localStorage.setItem(themeKey, theme)
+  // Storage can be blocked (private windows, strict privacy settings); fall back to the OS preference.
+  const getStoredTheme = () => {
+    try {
+      const theme = localStorage.getItem(themeKey)
+      return theme === 'light' || theme === 'dark' ? theme : null
+    } catch {
+      return null
+    }
+  }
+  const setStoredTheme = theme => {
+    try {
+      localStorage.setItem(themeKey, theme)
+    } catch {
+      // The choice then lasts only for this page view.
+    }
+  }
 
   const getPreferredTheme = () => {
     const storedTheme = getStoredTheme()
