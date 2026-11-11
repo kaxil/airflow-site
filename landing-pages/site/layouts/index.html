@@ -17,9 +17,7 @@
  under the License.
 */}}
 {{- /* The home page is a standalone document built with the design system (landing-pages/DESIGN.md): no baseof.html, Docsy or Bootstrap. */ -}}
-{{- $release := .Params.release -}}
-{{- $providers := "" -}}
-{{- with where .Params.stats.items "key" "providers" }}{{ $providers = (index . 0).value }}{{ else }}{{ errorf "content/en/_index.html: one [[stats.items]] entry needs key = \"providers\"; the home page shows its value in the hero and the integrations caption" }}{{ end -}}
+{{- $release := partial "site/release.html" .Params.release -}}
 {{- $docs := "/docs/apache-airflow/stable/" -}}
 {{- $start := printf "%sstart.html" $docs -}}
 {{- $upgrade := printf "%sinstallation/upgrading_to_airflow3.html" $docs -}}
@@ -68,7 +66,7 @@
     </div>
     <p class="hint rv" style="--i:4">For a reproducible install, pin dependencies with a <a class="ilink" href="{{ $docs }}installation/installing-from-pypi.html">constraints file</a>.</p>
     <ul class="chips rv" style="--i:5" aria-label="At a glance">
-      <li>Open source</li><li>Python</li><li>{{ $providers }} providers</li><li>Event-driven</li><li>Self-hosted or managed</li>
+      <li>Open source</li><li>Python</li><li>Integrations</li><li>Event-driven</li><li>Self-hosted or managed</li>
     </ul>
   </div>
   <button class="artctl" type="button" aria-pressed="false" aria-label="Pause the background animation"><svg class="i pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 3.5v9M10.5 3.5v9"/></svg><svg class="i play" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z"/></svg></button>
@@ -86,7 +84,7 @@
       <li><img src="{{ printf "home/img/logos/%s.png" (index . 0) | relURL }}" alt="" width="{{ index . 2 }}" height="26">{{ index . 1 }}</li>
       {{- end }}
     </ul>
-    <p class="more">Twelve of {{ $providers }} provider packages, shown to identify what they connect to; no endorsement implied. <a class="ilink" href="{{ "registry/" | relURL }}">Browse the Registry</a></p>
+    <p class="more">Some of the provider packages, shown to identify what they connect to; no endorsement implied. <a class="ilink" href="{{ "registry/" | relURL }}">Browse the Registry</a></p>
   </div>
 </section>
 
@@ -272,7 +270,7 @@
     <div class="grid12 up-grid">
       <div class="up-text">
         <h2 id="ui-h">Every run, in one UI</h2>
-        <p class="lead">The Grid view shows each Dag's runs side by side, with logs, graph, code and calendar a click away. The UI comes in light and dark themes, in English and 20 other languages.</p>
+        <p class="lead">The Grid view shows each Dag's runs side by side, with logs, graph, code and calendar a click away. The UI comes in light and dark themes, and the community translates it into many languages.</p>
         <a class="tlink" href="{{ $docs }}ui.html">Tour the UI {{ $arrow }}</a>
       </div>
       <figure class="browser glow">
@@ -353,12 +351,6 @@
       <li><a href="{{ index . 0 }}"><b>{{ index . 1 }}</b><span>{{ index . 2 }}</span>{{ $arrow }}</a></li>
       {{- end }}
     </ul>
-    <div class="stats" style="{{ printf "--n: %d" (len .Params.stats.items) | safeCSS }}">
-      {{- range .Params.stats.items }}
-      <a class="stat a-{{ .accent }}" href="{{ .url }}"><b>{{ .value }}</b><span>{{ .label }}</span></a>
-      {{- end }}
-      <p class="cap2">As of {{ .Params.stats.as_of }}, from GitHub, pypistats.org, the released providers and INTHEWILD.md.</p>
-    </div>
   </div>
 </section>
 

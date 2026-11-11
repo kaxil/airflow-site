@@ -9,7 +9,7 @@ menu:
         weight: 10
 # Each documentation set is a row on /docs/; the id keeps the anchor other sites link to.
 # The body lists the providers: add one under "Active providers" when it is first released.
-# The home page counts that list.
+# The lead above the list counts it (partials/site/provider-count.html).
 groups:
   - title: "Airflow"
     docs:
