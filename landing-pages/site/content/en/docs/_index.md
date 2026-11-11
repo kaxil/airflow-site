@@ -1,59 +1,51 @@
 ---
 title: "Documentation"
 linkTitle: "Documentation"
+description: "Guides and reference for Airflow, the tools around it, and its provider packages."
 weight: 20
 menu:
     main:
+        name: "Docs"
         weight: 10
+# Each documentation set is a row on /docs/; the id keeps the anchor other sites link to.
+# The body lists the providers: add one under "Active providers" when it is first released.
+# The home page counts that list.
+groups:
+  - title: "Airflow"
+    docs:
+      - id: "apache-airflow"
+        title: "Apache Airflow®"
+        url: "/docs/apache-airflow/stable/index.html"
+        description: "Install and run Airflow, write Dags, and operate the scheduler, API server, triggerer and workers. Includes the UI, CLI and REST API reference."
+      - id: "task-sdk"
+        title: "Task SDK"
+        url: "/docs/task-sdk/stable/index.html"
+        description: "The `airflow.sdk` interfaces that Dags and tasks are written against, and that tasks use at runtime for Connections, Variables and XComs. Built to stay stable across Airflow versions."
+  - title: "Deployment"
+    docs:
+      - id: "docker-stack"
+        title: "Docker image"
+        url: "/docs/docker-stack/index.html"
+        description: "The official image on Docker Hub, and how to extend or customize it for your deployment."
+      - id: "helm-chart"
+        title: "Helm chart"
+        url: "/docs/helm-chart/stable/index.html"
+        description: "The official chart for running Airflow on Kubernetes, in any cloud or on premises."
+  - title: "Tools and clients"
+    docs:
+      - id: "apache-airflow-ctl-airflowctl"
+        title: "airflowctl"
+        url: "/docs/apache-airflow-ctl/stable/index.html"
+        description: "A command-line client that manages Airflow through its REST API, with no direct access to the metadata database."
+      - id: "python-api-client"
+        title: "Python API client"
+        url: "https://github.com/apache/airflow-client-python"
+        description: "A Python client for the Airflow REST API."
+      - id: "apache-airflow-mypy-plugins"
+        title: "Mypy plugins"
+        url: "/docs/apache-airflow-mypy/stable/index.html"
+        description: "Optional plugins that teach mypy about Dags, custom operators, hooks, typed decorators and task outputs."
 ---
-
-# Documentation
-
-## [Apache Airflow®](/docs/apache-airflow/stable/index.html)
-
-Apache Airflow Core, which includes webserver, scheduler, CLI and other components that are needed for minimal Airflow installation.
-[Read Apache Airflow documentation >>](/docs/apache-airflow/stable/index.html)
-
-## [Apache Airflow CTL (airflowctl)](/docs/apache-airflow-ctl/stable/index.html)
-
-Apache Airflow CTL (airflowctl) is a command-line interface (CLI) for Apache Airflow that interacts exclusively with the Airflow REST API. It provides a secure, auditable, and consistent way to manage Airflow deployments — without direct access to the metadata database.
-[Read airflowctl documentation >>](/docs/apache-airflow-ctl/stable/index.html)
-
-## [Apache Airflow Mypy plugins](/docs/apache-airflow-mypy/stable/index.html)
-
-Apache Airflow Mypy provides optional, independently versioned plugins that improve static type checking
-for Dags, custom operators, hooks, typed decorators, and task outputs.
-[Read Apache Airflow Mypy documentation >>](/docs/apache-airflow-mypy/stable/index.html)
-
-## [Task SDK](/docs/task-sdk/stable/index.html)
-
-The Task SDK provides python-native interfaces for defining DAGs,
-executing tasks in isolated subprocesses and interacting with Airflow resources
-(e.g., Connections, Variables, XComs, Metrics, Logs, and OpenLineage events) at runtime. The goal of task-sdk is to decouple DAG authoring from Airflow internals (Scheduler, API Server, etc.), providing a forward-compatible, stable interface for writing and maintaining DAGs across Airflow versions.
-[Read Task SDK documentation >>](/docs/task-sdk/stable/index.html)
-
-## [Docker stack](/docs/docker-stack/index.html)
-
-Airflow has an official Dockerfile and Docker image published in DockerHub as a convenience package for
-installation. You can extend and customize the image according to your requirements and use it in
-your own deployments.
-[Read Docker stack documentation >>](/docs/docker-stack/index.html)
-
-
-## [Helm Chart](/docs/helm-chart/stable/index.html)
-
-Airflow has an official Helm Chart that will help you set up your own Airflow on a cloud/on-prem Kubernetes environment and leverage its scalable nature to support a large group of users. Thanks to Kubernetes, we are not tied to a specific cloud provider.
-[Read Helm Chart documentation >>](/docs/helm-chart/stable/index.html)
-
-## [Python API Client](https://github.com/apache/airflow-client-python)
-
-Airflow releases official Python API client that can be used to easily interact with Airflow REST API from Python code.
-[See the client repository](https://github.com/apache/airflow-client-python)
-
-## [Providers packages](/docs/apache-airflow-providers/index.html)
-
-Providers packages include integrations with third party projects. They are versioned and released independently of the Apache Airflow core.
-[Read Providers documentation >>](/docs/apache-airflow-providers/index.html)
 
 ### Active providers
 
@@ -286,28 +278,23 @@ Providers packages include integrations with third party projects. They are vers
 
 ### Suspended providers
 
-These providers are currently suspended from releases and we are not actively testing their compatibility with
-latest Airflow releases. You can still use the released versions of these providers if you need to and in case
-the reason for suspension is resolved, the provider might be resumed by a PR of a community member who will
-resolve the suspension reason. It the provider is suspended for quite some time, the community might make a
-decision about removing it.
+Suspended providers get no new releases and aren't tested against new Airflow versions, though
+their released versions still work. A community member can resume one by fixing the reason it was
+suspended, and one that stays suspended for long may be removed. The
+[provider lifecycle](https://github.com/apache/airflow/blob/main/PROVIDERS.rst#community-providers-lifecycle)
+has the details.
 
-More about the suspension/resuming process can be found in the
-[Community provider's lifecycle documentation](https://github.com/apache/airflow/blob/main/PROVIDERS.rst#community-providers-lifecycle) page.
-
-* No suspended providers at the moment
+No providers are suspended right now.
 
 ### Removed providers
 
-These providers are no longer supported and have been removed from the codebase, you can however still
-use the released versions of these providers if you need to.
-
-More about the removal process can be found in the
-[Community provider's lifecycle documentation](https://github.com/apache/airflow/blob/main/PROVIDERS.rst#community-providers-lifecycle) page.
+These providers are no longer in the codebase. Their released versions still work. The
+[provider lifecycle](https://github.com/apache/airflow/blob/main/PROVIDERS.rst#community-providers-lifecycle)
+has the details.
 
 {{< rawhtml >}}
 
-<ul class="list-providers">
+<ul class="list-providers removed">
 
   <li><a href="/docs/apache-airflow-providers-apache-sqoop/stable/index.html"><code>Apache Sqoop</code></a></li>
 

@@ -20,7 +20,7 @@
 {{- /*
   Returns the page's rendered content without a leading h1 or h2 that repeats the page's
   title (compared without case), since the page header already shows the title. Used by
-  prose-page.html and docs/list.html. Call with the page.
+  prose-page.html. Call with the page.
 */ -}}
 {{- $content := string .Content -}}
 {{- with findRESubmatch `\A\s*<h[12][^>]*>([^<]*)</h[12]>` $content 1 -}}

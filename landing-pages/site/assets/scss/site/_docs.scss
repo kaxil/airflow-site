@@ -17,81 +17,176 @@
  * under the License.
  */
 
-// The documentation landing page (layouts/docs/list.html): a card per documentation set,
-// then the lists of providers.
+// The documentation landing page (layouts/docs/list.html): the documentation sets in groups,
+// then a band with the providers.
 
-.docs-intro { margin-bottom: 40px; }
+// A group: its name in a column on the left, its documentation sets as rows on the right.
+.docs-group {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 32px;
 
-.docs-cards { --card-min: 320px; }
+  & + & { margin-top: 48px; }
 
-.docs-desc {
-  font-size: 15px;
-  line-height: 24px;
+  > .label { margin: 22px 0 0; }
 }
 
-// The providers lists that follow the cards.
-.docs-more.prose {
-  max-width: none;
-  margin-top: 72px;
+.docs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line-2);
 
-  > p,
-  > ul:not(.list-providers) { max-width: $measure; }
+  li {
+    margin: 0;
+    border-bottom: 1px solid var(--line-2);
+    scroll-margin-top: 16px;
+  }
+}
+
+.docs-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  padding: 20px 0;
+  color: var(--soft);
+  text-decoration: none;
+
+  b {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text);
+    font-size: 20px;
+    line-height: 28px;
+    transition: color .15s ease;
+  }
+
+  > .i {
+    color: var(--dim);
+    transition: transform .15s ease, color .15s ease;
+  }
+
+  &:hover {
+    b { color: var(--link); }
+
+    > .i {
+      color: var(--text);
+      transform: translateX(3px);
+    }
+  }
+}
+
+.docs-desc {
+  display: block;
+  max-width: $measure;
+  font-size: 15px;
+  line-height: 24px;
+
+  p { margin: 0; }
+}
+
+.docs-providers { padding: 72px 0 96px; }
+
+.docs-providers-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 32px;
+
+  .h-section { margin-bottom: 12px; }
+}
+
+.docs-providers-lead {
+  max-width: $lead-measure;
+  margin: 0;
+  color: var(--soft);
+
+  .tlink { margin-left: 4px; }
+}
+
+.docs-filter {
+  flex: 0 0 320px;
+
+  &[hidden] { display: none; }
+}
+
+.docs-empty { color: var(--soft); }
+
+// The provider lists in the page body.
+.docs-provider-lists.prose {
+  max-width: none;
+
+  > p { max-width: $measure; }
 
   > h3 {
-    margin: 56px 0 16px;
-    font-size: 28px;
-    line-height: 36px;
-    letter-spacing: -.015em;
+    margin: 48px 0 12px;
+    font-size: 22px;
+    line-height: 30px;
   }
 
   > h3:first-child { margin-top: 0; }
 
   .list-providers {
     list-style: none;
+    margin: 16px 0 0;
     padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 8px;
+    columns: 4 200px;
+    column-gap: 32px;
 
-    li { margin: 0; }
+    li {
+      margin: 0;
+      break-inside: avoid;
+    }
 
     a {
       display: block;
-      height: 100%;
-      padding: 10px 14px;
-      border: 1px solid var(--line-2);
-      border-radius: 8px;
-      background: var(--surface);
+      padding: 5px 0;
       color: var(--text);
+      font-size: 15px;
+      line-height: 22px;
       text-decoration: none;
-      transition: border-color .15s ease, background-color .15s ease;
 
-      &:hover {
-        border-color: var(--line-3);
-        background: var(--tint);
-      }
+      &:hover { color: var(--link); }
     }
 
+    // The names are in <code> in the Markdown; show them as plain text.
     code {
       padding: 0;
       background: none;
       color: inherit;
-      font: 500 14px/20px var(--mono);
+      font: inherit;
     }
   }
+
+  // Removed providers: still linked for their old releases, but set back.
+  .list-providers.removed a { color: var(--soft); }
+}
+
+@media (max-width: $tablet) {
+  .docs-group {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+
+    > .label { margin: 0; }
+  }
+
+  .docs-providers-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .docs-filter { flex-basis: auto; }
 }
 
 @media (max-width: $phone) {
-  .docs-cards { grid-template-columns: minmax(0, 1fr); }
-
-  .docs-more.prose {
-    margin-top: 56px;
-
-    > h3 {
-      font-size: 24px;
-      line-height: 30px;
-    }
-
-    .list-providers { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .docs-row b {
+    font-size: 18px;
+    line-height: 26px;
   }
+
+  .docs-providers { padding: 48px 0 64px; }
+
+  .docs-provider-lists.prose .list-providers { columns: 2; }
 }

@@ -18,51 +18,50 @@
 */}}
 
 {{- /*
-  /docs/: each h2 section of content/en/docs/_index.md ("## [Name](url)", a description and
-  a "Read ... >>" link) becomes a card, and keeps the heading's id: other sites link to
-  anchors such as /docs/#providers-packages. The h3 sections that follow an h2 (the active,
-  suspended and removed providers) render in full below the cards. A section that doesn't
-  match that shape still renders, as the card's body.
+  /docs/: the documentation sets from the front matter of content/en/docs/_index.md, in
+  groups, then the providers: a filter (src/js/providersFilter.js) over the lists in the
+  page body. The row ids and #providers-packages are anchors other sites link to.
 */ -}}
 {{ define "main" }}
-{{- $content := partial "site/strip-title.html" . -}}
-{{- $parts := split $content "<h2" -}}
-{{- $more := "" }}
 {{ partial "site/page-head.html" (dict "page" .) }}
 <section class="page-body">
   <div class="wrap">
-    {{- with strings.TrimSpace (index $parts 0) }}
-    <div class="prose docs-intro">{{ . | safeHTML }}</div>
+    {{- range .Params.groups }}
+    <div class="docs-group">
+      <h2 class="label">{{ .title }}</h2>
+      <ul class="docs-list">
+        {{- range .docs }}
+        <li{{ with .id }} id="{{ . }}"{{ end }}>
+          <a class="docs-row" href="{{ .url }}">
+            <span>
+              <b>{{ .title }}</b>
+              <span class="docs-desc">{{ .description | markdownify }}</span>
+            </span>
+            {{ partial "design/icon.html" "arrow" }}
+          </a>
+        </li>
+        {{- end }}
+      </ul>
+    </div>
     {{- end }}
-    <ul class="cards docs-cards">
-      {{- range after 1 $parts }}
-      {{- $h3s := split (printf "<h2%s" .) "<h3" }}
-      {{- $card := index $h3s 0 }}
-      {{- range after 1 $h3s }}{{ $more = printf "%s<h3%s" $more . }}{{ end }}
-      {{- $heading := index (findRESubmatch `\A<h2[^>]*>([\s\S]*?)</h2>` $card 1) 0 1 }}
-      {{- $id := "" }}
-      {{- with findRESubmatch `\A<h2[^>]*\sid="([^"]*)"` $card 1 }}{{ $id = index . 0 1 }}{{ end }}
-      {{- $href := "" }}
-      {{- with findRESubmatch `href="([^"]*)"` $heading 1 }}{{ $href = index . 0 1 }}{{ end }}
-      {{- $body := replaceRE `\A<h2[^>]*>[\s\S]*?</h2>` "" $card 1 }}
-      {{- $read := findRESubmatch `<a href="([^"]*)">([^<]*)</a>\s*</p>\s*\z` $body 1 }}
-      <li>
-        <article class="card card-link">
-          <h2{{ with $id }} id="{{ . }}"{{ end }}>{{ with $href }}<a class="card-target" href="{{ . }}">{{ $heading | plainify | htmlUnescape }}</a>{{ else }}{{ $heading | safeHTML }}{{ end }}</h2>
-          {{- with $read }}
-          {{- $m := index . 0 }}
-          <div class="docs-desc">{{ replaceRE `\s*<a href="[^"]*">[^<]*</a>\s*</p>\s*\z` "</p>" $body 1 | safeHTML }}</div>
-          <a class="tlink" href="{{ index $m 1 }}">{{ index $m 2 | htmlUnescape | replaceRE `\s*(>>|»)\s*\z` "" }} {{ partial "design/icon.html" "arrow" }}</a>
-          {{- else }}
-          <div class="docs-desc">{{ $body | safeHTML }}</div>
-          {{- end }}
-        </article>
-      </li>
-      {{- end }}
-    </ul>
-    {{- with $more }}
-    <div class="prose docs-more">{{ . | safeHTML }}</div>
-    {{- end }}
+  </div>
+</section>
+<section class="band docs-providers" id="providers-packages" aria-labelledby="providers-h">
+  <div class="wrap">
+    <div class="docs-providers-head">
+      <div>
+        <h2 class="h-section" id="providers-h">Providers</h2>
+        <p class="docs-providers-lead">{{ with partialCached "site/provider-count.html" "" }}{{ . }} provider{{ else }}Provider{{ end }} packages connect Airflow to other services. Each is versioned and released on its own.
+          <a class="tlink" href="{{ "docs/apache-airflow-providers/index.html" | relURL }}">Providers documentation {{ partial "design/icon.html" "arrow" }}</a></p>
+      </div>
+      <div class="search docs-filter" hidden>
+        <label for="provider-filter" class="visually-hidden">Filter providers</label>
+        {{ partial "design/icon.html" "search" }}
+        <input type="search" id="provider-filter" placeholder="Filter providers" autocomplete="off">
+      </div>
+    </div>
+    <p class="docs-empty" role="status" hidden>No providers match.</p>
+    <div class="prose docs-provider-lists">{{ .Content }}</div>
     {{ partial "site/edit-link.html" . }}
   </div>
 </section>

@@ -30,6 +30,10 @@ if (document.querySelector(".meetups")) {
   import("./js/meetupsList.js");
 }
 
+if (document.querySelector(".docs-filter")) {
+  import("./js/providersFilter");
+}
+
 if (document.querySelector("details[data-tab]")) {
   import("./js/detailsTabs");
 }
