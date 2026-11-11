@@ -1,0 +1,27 @@
+{{/*
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+*/}}
+{{- /*
+  A copy button. Pass the label and one of: copy (the text itself), copyEl (the id of an
+  element whose text to copy) or copyCode (the id of a design/highlight.html block, copied
+  without line numbers). text is an optional visible label, hidden on phones.
+*/ -}}
+<button class="copy" type="button" aria-label="{{ .label }}"
+  {{- with .copy }} data-copy="{{ . }}"{{ end }}
+  {{- with .copyEl }} data-copy-el="{{ . }}"{{ end }}
+  {{- with .copyCode }} data-copy-code="{{ . }}"{{ end }}>{{ partial "design/icon.html" "copy" }}{{ with .text }}<span class="hide-s">{{ . }}</span>{{ end }}</button>

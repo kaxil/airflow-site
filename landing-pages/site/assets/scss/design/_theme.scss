@@ -1,0 +1,75 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+// Theme helpers. This file emits no CSS.
+
+// theme-light and theme-dark wrap declarations in the selectors each theme applies to:
+// light by default and on [data-bs-theme="light"]; dark on [data-bs-theme="dark"], and on
+// :root when nothing is stored and the OS asks for dark. data-bs-theme is the attribute the
+// site's theme toggle (assets/js/dark-mode.js) sets, and Bootstrap uses the same scoping,
+// so the attribute also works on any element. A page with its own theme-dependent values
+// declares them with these mixins.
+@mixin theme-light {
+  :root,
+  [data-bs-theme="light"] {
+    color-scheme: light;
+
+    @content;
+  }
+}
+
+@mixin theme-dark {
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-bs-theme="light"]) {
+      color-scheme: dark;
+
+      @content;
+    }
+  }
+
+  [data-bs-theme="dark"] {
+    color-scheme: dark;
+
+    @content;
+  }
+}
+
+// Emits a map as custom properties: (bg: #fff) becomes --bg: #fff.
+@mixin custom-properties($map) {
+  @each $name, $value in $map {
+    --#{$name}: #{$value};
+  }
+}
+
+// Inline code in running text: a tinted chip.
+@mixin code-chip {
+  font-size: .86em;
+  color: var(--text);
+  background: var(--tint);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+// The mono uppercase label (section eyebrows, footer headings, diagram layers).
+@mixin label {
+  font: 500 12px/16px var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}

@@ -1,0 +1,32 @@
+{{/*
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+*/}}
+{{- /*
+  The main menu from the site config, as a list of dicts (name, href, external), with
+  the same links and new-tab rule as the site navbar (partials/navbar.html).
+  It depends only on the site, so call it cached: {{ $menu := partialCached "design/menu.html" . }}
+*/ -}}
+{{- $menu := slice -}}
+{{- $siteHost := (urls.Parse .Site.Params.Baseurl).Host -}}
+{{- range .Site.Menus.main -}}
+  {{- $href := .URL | relLangURL -}}
+  {{- with .Page }}{{ $href = .RelPermalink }}{{ end -}}
+  {{- $external := ne (urls.Parse .URL).Host $siteHost -}}
+  {{- $menu = $menu | append (dict "name" .Name "href" $href "external" $external) -}}
+{{- end -}}
+{{- return $menu -}}

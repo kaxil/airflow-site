@@ -1,0 +1,125 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+// Palette: every colour value in the design system, as Sass maps. This file emits no CSS,
+// so any stylesheet can import it to read a value, including the Bootstrap and Docsy
+// variables the rest of the site compiles. _tokens.scss turns the maps into CSS custom
+// properties. See landing-pages/DESIGN.md.
+
+// The Airflow pinwheel, from the AIP-11 brand book (also in ../_colors.scss).
+$brand: (
+  cerulean-blue: #017cee,
+  bright-sky-blue: #0cb6ff,
+  shamrock: #00ad46,
+  shamrock-green: #04d659,
+  aqua-blue: #00c7d4,
+  aqua: #11e1ee,
+  vermillion: #e43921,
+  melon: #ff7557,
+);
+
+// Colours that are the same in both themes.
+$fixed: (
+  blue: map-get($brand, cerulean-blue),
+  blue-btn: #0172e0,
+  blue-btn-hover: #0168cf,
+  on-blue: #fff,
+);
+
+$light: (
+  bg: #fff,
+  bg-raise: #f5f7fa,
+  surface: #fff,
+  surface-2: #f1f4f8,
+  surface-3: #e8ecf2,
+  inset: rgba(241, 244, 248, .85),
+  nav-bg: rgba(255, 255, 255, .94),
+  logo-ink: #51504f,
+  tint: rgba(15, 23, 42, .05),
+  tint-2: rgba(15, 23, 42, .08),
+  line: rgba(15, 23, 42, .08),
+  line-2: rgba(15, 23, 42, .14),
+  line-3: rgba(15, 23, 42, .24),
+  text: #0b1220,
+  soft: #3a4556,
+  dim: #556072,
+  link: #0b63ce,
+  green: #00a346,
+  green-2: #007a35,
+  teal-2: #006d76,
+  blue-2: #0a6ccc,
+  red: #d63b20,
+  red-2: #b0301a,
+  amber: #d98a00,
+  amber-2: #855407,
+  accent-blue: #1a62c2,
+  code-bg: #f7f9fc,
+  code-fg: #1f2937,
+  code-ln: #5f6878,
+  tok-kw: #0b5cc4,
+  tok-str: #0b6e36,
+  tok-dec: #b5401f,
+  tok-fn: #00737d,
+  tok-ty: #6b46c1,
+  tok-cm: #5f6673,
+  tok-num: #8f5000,
+  shadow-win: (0 1px 2px rgba(15, 23, 42, .06), 0 32px 64px -32px rgba(15, 23, 42, .25)),
+  glow: .35,
+);
+
+$dark: (
+  bg: #070a12,
+  bg-raise: #0d1322,
+  surface: #0e1424,
+  surface-2: #141b2e,
+  surface-3: #1a2338,
+  inset: rgba(7, 10, 18, .72),
+  nav-bg: rgba(7, 10, 18, .94),
+  logo-ink: rgba(255, 255, 255, .85),
+  tint: rgba(148, 170, 210, .07),
+  tint-2: rgba(148, 170, 210, .1),
+  line: rgba(148, 170, 210, .1),
+  line-2: rgba(148, 170, 210, .18),
+  line-3: rgba(148, 170, 210, .28),
+  text: #fff,
+  soft: #b9c0cc,
+  dim: #8b93a3,
+  link: #4db3ff,
+  green: map-get($brand, shamrock),
+  green-2: map-get($brand, shamrock-green),
+  teal-2: map-get($brand, aqua),
+  blue-2: map-get($brand, bright-sky-blue),
+  red: map-get($brand, vermillion),
+  red-2: map-get($brand, melon),
+  amber: #f5a524,
+  amber-2: #f5a524,
+  accent-blue: #3d9bff,
+  code-bg: #0e1424,
+  code-fg: #d5dbe6,
+  code-ln: #7d879b,
+  tok-kw: #7db9ff,
+  tok-str: #86e3a4,
+  tok-dec: #ff9d85,
+  tok-fn: #7fe9f0,
+  tok-ty: #c9b8ff,
+  tok-cm: #8590a6,
+  tok-num: #f5c46b,
+  shadow-win: (inset 0 1px 0 rgba(255, 255, 255, .05), 0 2px 4px rgba(0, 0, 0, .3), 0 48px 96px -32px rgba(0, 0, 0, .85)),
+  glow: .7,
+);

@@ -1,0 +1,102 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+// Tokens: the palette and theme as CSS custom properties, the fonts, and the accent
+// classes. Its only selectors are :root, [data-bs-theme] and a few utility classes, so any
+// stylesheet can import it. Needs _palette.scss and _theme.scss first (see _kit.scss).
+
+// Fonts: self-hosted latin subsets, SIL Open Font License 1.1 (static/external/fonts/OFL-*.txt).
+// design/head.html preloads the two main files; keep those URLs in step with these.
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/external/fonts/InstrumentSans-normal-400_700.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/external/fonts/InstrumentSans-symbols-400_700.woff2") format("woff2");
+  unicode-range: U+2192, U+2190, U+2197;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/external/fonts/JetBrainsMono-normal-400_600.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/external/fonts/JetBrainsMono-symbols-400_600.woff2") format("woff2");
+  unicode-range: U+2192, U+2190, U+2197, U+25B6, U+00D7, U+25A0;
+}
+
+:root {
+  @include custom-properties($fixed);
+
+  --acc: var(--blue);
+  --sans: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", menlo, monospace;
+  --pad: 128px;
+  --gutter: 24px;
+  --side: 24px;
+}
+
+@include theme-light { @include custom-properties($light); }
+
+@include theme-dark { @include custom-properties($dark); }
+
+// Images with a version per theme. These follow the page's theme only, not a
+// data-bs-theme set on an inner element.
+:root[data-bs-theme="dark"] .only-light,
+:root[data-bs-theme="light"] .only-dark { display: none; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-bs-theme]) .only-light { display: none; }
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-bs-theme]) .only-dark { display: none; }
+}
+
+@media (max-width: 760px) {
+  :root {
+    --pad: 80px;
+    --side: 16px;
+  }
+}
+
+// Accent classes set --acc, which tabs, tags, windows and highlighted code lines use.
+.a-green { --acc: var(--green-2); }
+.a-teal { --acc: var(--teal-2); }
+.a-amber { --acc: var(--amber-2); }
+.a-red { --acc: var(--red-2); }
+.a-blue { --acc: var(--accent-blue); }

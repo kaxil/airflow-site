@@ -1,0 +1,38 @@
+{{/*
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+*/}}
+{{- /*
+  <head> for a standalone page built with the design system.
+  page: the page; css: an SCSS entry under assets/; js: a JS entry under assets/
+  (bundled with its imports by js.Build). The title is the page's, then the site's.
+*/ -}}
+{{- $page := .page -}}
+{{- $css := resources.Get .css | toCSS (dict "enableSourceMap" hugo.IsServer) -}}
+{{- $js := resources.Get .js | js.Build (dict "minify" hugo.IsProduction) -}}
+{{- if hugo.IsProduction }}{{ $css = $css | postCSS | minify | fingerprint }}{{ $js = $js | fingerprint }}{{ end -}}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ if not $page.IsHome }}{{ $page.Title }} | {{ end }}{{ $page.Site.Title }}</title>
+{{/* The site's theme script, inlined so the theme is set before first paint. */}}
+<script>document.documentElement.classList.add('js');{{ (resources.Get "js/dark-mode.js" | minify).Content | safeJS }}</script>
+{{ partial "head-meta.html" $page }}
+{{- /* Preloads for the fonts _tokens.scss declares; keep the two in step. */}}
+<link rel="preload" href="{{ "external/fonts/InstrumentSans-normal-400_700.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ "external/fonts/JetBrainsMono-normal-400_600.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{ $css.RelPermalink }}"{{ with $css.Data.Integrity }} integrity="{{ . }}"{{ end }}>
+<script src="{{ $js.RelPermalink }}"{{ with $js.Data.Integrity }} integrity="{{ . }}"{{ end }} defer></script>

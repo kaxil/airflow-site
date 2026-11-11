@@ -1,0 +1,185 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+// Site navigation: logo, menu from the site config, theme toggle and the mobile menu sheet.
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--line);
+
+  &:has(.mnav[open]) { background: var(--bg); }
+
+  // The site menu is long, so the nav row is wider than the content grid.
+  .wrap {
+    display: flex;
+    align-items: center;
+    max-width: calc(1440px + 2 * var(--side));
+    height: 64px;
+    gap: 8px;
+  }
+}
+
+.brand {
+  flex: none;
+  display: flex;
+  align-items: center;
+  margin-right: 16px;
+  border-radius: 6px;
+
+  svg {
+    width: 93px;
+    height: auto;
+  }
+
+  // The site's logo asset draws its wordmark in a fixed grey; follow the theme instead.
+  [fill="#51504f"],
+  [fill="#4a4848"] { fill: var(--logo-ink); }
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 8px;
+    border-radius: 6px;
+    font: 500 14px/1 var(--sans);
+    color: var(--soft);
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+      color: var(--text);
+      background: var(--tint);
+    }
+  }
+}
+
+.nav-right {
+  flex: none;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  padding: 0;
+}
+
+.gh {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid var(--line-3);
+  color: var(--text);
+
+  &:hover { background: var(--tint); }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: currentcolor;
+  }
+}
+
+.mnav {
+  display: none;
+
+  summary {
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    border: 1px solid var(--line-3);
+    cursor: pointer;
+    color: var(--text);
+
+    &::-webkit-details-marker { display: none; }
+
+    .x { display: none; }
+  }
+
+  &[open] summary {
+    .x { display: block; }
+
+    .b { display: none; }
+  }
+}
+
+.mnav-panel {
+  position: fixed;
+  inset: var(--nav-bottom, 64px) 0 0;
+  overflow-y: auto;
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  padding: 16px var(--side) 40px;
+
+  a:not(.btn) {
+    display: block;
+    padding: 12px 0;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 17px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .btn {
+    margin-top: 24px;
+    width: 100%;
+  }
+}
+
+.nav.collapsed {
+  .menu { display: none; }
+
+  .mnav { display: block; }
+}
+
+@media (max-width: 1279px) {
+  html:not(.ready) {
+    .menu { display: none; }
+
+    .mnav { display: block; }
+  }
+}
+
+@media (max-width: 560px) {
+  .nav-cta { display: none; }
+}
+
+html:not(.js) .theme { display: none; }

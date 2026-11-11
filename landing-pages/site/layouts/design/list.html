@@ -1,0 +1,115 @@
+{{/*
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+*/}}
+{{- /*
+  The design system reference (/design/): the colour tokens and the components, rendered
+  once in each theme. Not in the menu or the sitemap. See landing-pages/DESIGN.md.
+*/ -}}
+{{- $arrow := partial "design/icon.html" "arrow" -}}
+{{- $groups := slice
+  (dict "name" "Surfaces" "tokens" (slice "--bg" "--bg-raise" "--surface" "--surface-2" "--surface-3" "--inset" "--nav-bg" "--code-bg"))
+  (dict "name" "Lines" "tokens" (slice "--line" "--line-2" "--line-3" "--tint" "--tint-2"))
+  (dict "name" "Text" "tokens" (slice "--text" "--soft" "--dim" "--link" "--logo-ink" "--code-fg" "--code-ln"))
+  (dict "name" "Brand and accents" "tokens" (slice "--blue" "--blue-btn" "--blue-btn-hover" "--on-blue" "--blue-2" "--accent-blue" "--green" "--green-2" "--teal-2" "--red" "--red-2" "--amber" "--amber-2"))
+  (dict "name" "Code" "tokens" (slice "--tok-kw" "--tok-str" "--tok-dec" "--tok-fn" "--tok-ty" "--tok-cm" "--tok-num"))
+-}}
+{{- /* Built once and shown in both panels. */ -}}
+{{- $window := partial "design/code-window.html" (dict
+  "label" "Example code window"
+  "dag" "ingest_orders" "tag" "@task"
+  "src" "home/samples/orders.py" "lang" "python" "hl" "6-17"
+  "caption" "A real sample file in a window, with highlighted lines.") -}}
+<!doctype html>
+<html lang="{{ .Site.Language.Lang }}">
+<head>
+{{ partial "design/head.html" (dict "page" . "css" "scss/design/reference.scss" "js" "js/design-page.js") }}
+</head>
+<body>
+{{ partial "design/nav.html" . }}
+
+<main id="main">
+<section class="ref-intro">
+  <div class="wrap">
+    <p class="label">Apache Airflow website</p>
+    <h1>{{ .Title }}</h1>
+    <p class="lead">The colour tokens and components that pages on this site are built from, in both themes. Use these instead of new colours or one-off styles. The rules, the other tokens and the file map are in <a class="ilink" href="https://github.com/apache/airflow-site/blob/main/landing-pages/DESIGN.md">DESIGN.md</a>.</p>
+  </div>
+</section>
+
+<section class="ref">
+  <div class="wrap ref-themes">
+    {{- range slice "light" "dark" }}
+    <div class="ref-panel" data-bs-theme="{{ . }}">
+      <h2 class="label">{{ . | title }} theme</h2>
+
+      <h3>Colour</h3>
+      {{- range $groups }}
+      <p class="ref-group">{{ .name }}</p>
+      <ul class="swatches">
+        {{- range .tokens }}
+        {{- /* The token names are the fixed list above, so the generated style is trusted. */}}
+        <li><span class="sw" style="{{ printf "background: var(%s)" . | safeCSS }}"></span><code>{{ . }}</code></li>
+        {{- end }}
+      </ul>
+      {{- end }}
+
+      <h3>Type</h3>
+      <div class="ref-type">
+        <p class="h1">Heading 1</p>
+        <p class="h2">Heading 2</p>
+        <p class="h3">Heading 3</p>
+        <p class="lead">Lead text introduces a section in one or two sentences.</p>
+        <p>Body text is Instrument Sans at 17/26, in <code>--soft</code>. Inline <code>code</code> sits in a tinted chip, and <a class="ilink" href="#main">links are underlined</a>.</p>
+        <p class="label">Label</p>
+        <p class="hint">Hint text, for notes under a control.</p>
+      </div>
+
+      <h3>Buttons and links</h3>
+      <div class="ref-row">
+        <a class="btn btn-primary" href="#main">Primary</a>
+        <a class="btn btn-secondary" href="#main">Secondary</a>
+        <a class="btn btn-primary btn-sm" href="#main">Small</a>
+        <a class="tlink" href="#main">Text link {{ $arrow }}</a>
+      </div>
+
+      <h3>Controls</h3>
+      <div class="ref-row">
+        <div class="seg" role="group" aria-label="Example segmented control"><button type="button" aria-pressed="true">pip</button><button type="button" aria-pressed="false">uv</button></div>
+        {{ partial "design/copy-button.html" (dict "label" "Copy an example command" "copy" "airflow standalone") }}
+        {{- range slice "a-blue" "a-green" "a-teal" "a-amber" "a-red" }}
+        <span class="tag {{ . }}">{{ strings.TrimPrefix "a-" . }}</span>
+        {{- end }}
+      </div>
+
+      <h3>Window</h3>
+      {{ $window }}
+
+      <h3>Terminal</h3>
+      <div class="term">
+<div class="cmd">airflow dags test ingest_orders</div>
+<div class="dim-t">[info] Task instance state updated  … <span class="ok-t">new_state=success</span></div>
+      </div>
+    </div>
+    {{- end }}
+  </div>
+</section>
+</main>
+
+{{ partial "design/footer.html" . }}
+</body>
+</html>

@@ -16,44 +16,19 @@
  specific language governing permissions and limitations
  under the License.
 */}}
-{{- /* The home page is a standalone document: it does not use baseof.html, Docsy or Bootstrap. */ -}}
+{{- /* The home page is a standalone document built with the design system (landing-pages/DESIGN.md): no baseof.html, Docsy or Bootstrap. */ -}}
 {{- $release := .Params.release -}}
-{{- $providers := (index (where .Params.stats.items "key" "providers") 0).value -}}
+{{- $providers := "" -}}
+{{- with where .Params.stats.items "key" "providers" }}{{ $providers = (index . 0).value }}{{ else }}{{ errorf "content/en/_index.html: one [[stats.items]] entry needs key = \"providers\"; the home page shows its value in the hero and the integrations caption" }}{{ end -}}
 {{- $docs := "/docs/apache-airflow/stable/" -}}
 {{- $start := printf "%sstart.html" $docs -}}
 {{- $upgrade := printf "%sinstallation/upgrading_to_airflow3.html" $docs -}}
-{{- $menu := slice -}}
-{{- /* Same links and new-tab rule as the site navbar (partials/navbar.html). */ -}}
-{{- range .Site.Menus.main -}}
-  {{- $href := .URL | relLangURL -}}
-  {{- with .Page }}{{ $href = .RelPermalink }}{{ end -}}
-  {{- $external := ne (urls.Parse .URL).Host (urls.Parse $.Site.Params.Baseurl).Host -}}
-  {{- $menu = $menu | append (dict "name" .Name "href" $href "external" $external) -}}
-{{- end -}}
-{{- /* Code samples are real files, parsed by Airflow in review; the license header the repo requires is cut before display. */ -}}
-{{- $hl := "linenos=inline,lineNumbersInTable=false,noClasses=false" -}}
-{{- $sample := dict -}}
-{{- range resources.Match "home/samples/*" -}}
-  {{- $sample = merge $sample (dict (path.Base .Name) (replaceRE "(?s)\\A(?:(?:#|//)[^\\n]*\\n)+\\n" "" .Content)) -}}
-{{- end -}}
-{{- $arrow := `<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9.5M8.5 4l4 4-4 4"/></svg>` | safeHTML -}}
-{{- $copyIcons := `<svg class="i cp-i" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/></svg><svg class="i ok-i" viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7"/></svg>` | safeHTML -}}
+{{- $arrow := partial "design/icon.html" "arrow" -}}
 {{- $halves := `<div class="half l"><div class="strip"></div></div><div class="half r"><div class="strip"></div></div>` | safeHTML -}}
-{{- $css := resources.Get "scss/home/home.scss" | toCSS (dict "enableSourceMap" hugo.IsServer) -}}
-{{- $js := resources.Get "js/home.js" -}}
-{{- if hugo.IsProduction }}{{ $css = $css | postCSS | minify | fingerprint }}{{ $js = $js | minify | fingerprint }}{{ end -}}
 <!doctype html>
 <html lang="{{ .Site.Language.Lang }}">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ .Site.Title }}</title>
-{{/* The site's theme script, inlined so the theme is set before first paint. */}}
-<script>document.documentElement.classList.add('js');{{ (resources.Get "js/dark-mode.js" | minify).Content | safeJS }}</script>
-{{ partial "head-meta.html" . }}
-<link rel="preload" href="{{ "home/fonts/InstrumentSans-normal-400_700.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="{{ "home/fonts/JetBrainsMono-normal-400_600.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{{ $css.RelPermalink }}"{{ with $css.Data.Integrity }} integrity="{{ . }}"{{ end }}>
+{{ partial "design/head.html" (dict "page" . "css" "scss/home/home.scss" "js" "js/home.js") }}
 <script type="application/ld+json">
 {{ dict
   "@context" "https://schema.org"
@@ -73,38 +48,7 @@
 </script>
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
-
-<header class="nav">
-  <div class="wrap">
-    <a class="brand" href="{{ .Site.Home.RelPermalink }}" aria-label="Apache Airflow home">{{ with resources.Get "icons/airflow-logo.svg" }}{{ .Content | safeHTML }}{{ end }}</a>
-    <nav aria-label="Main">
-      <ul class="menu">
-        {{- range $menu }}
-        <li><a href="{{ .href }}"{{ if .external }} target="_blank"{{ end }}>{{ .name }}</a></li>
-        {{- end }}
-      </ul>
-    </nav>
-    <div class="nav-right">
-      <div class="seg theme" role="group" aria-label="Color theme">
-        <button type="button" class="theme-toggle-pill__btn" data-theme-value="light" aria-pressed="false" aria-label="Light theme"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M3.4 12.6l1-1M11.6 4.4l1-1"/></svg></button>
-        <button type="button" class="theme-toggle-pill__btn" data-theme-value="dark" aria-pressed="false" aria-label="Dark theme"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.6A5.5 5.5 0 0 1 6.4 2.5a5.5 5.5 0 1 0 7.1 7.1Z"/></svg></button>
-      </div>
-      <a class="gh" href="https://github.com/apache/airflow" aria-label="Apache Airflow on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></a>
-      <a class="btn btn-primary btn-sm nav-cta" href="{{ $start }}">Get started</a>
-      <details class="mnav">
-        <summary aria-label="Menu"><svg class="i b" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/></svg><svg class="i x" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg></summary>
-        <div class="mnav-panel">
-          {{- range $menu }}
-          <a href="{{ .href }}"{{ if .external }} target="_blank"{{ end }}>{{ .name }}</a>
-          {{- end }}
-          <a href="https://github.com/apache/airflow">GitHub</a>
-          <a class="btn btn-primary" href="{{ $start }}">Get started</a>
-        </div>
-      </details>
-    </div>
-  </div>
-</header>
+{{ partial "design/nav.html" . }}
 
 <main id="main">
 <section class="hero" aria-labelledby="hero-h">
@@ -113,14 +57,14 @@
   <div class="wrap">
     <a class="pill rv" style="--i:0" href="{{ $release.blog | relURL }}"><span class="badge">Airflow {{ $release.short }}</span><span class="pd">{{ $release.highlights }}</span><span class="pm">What's new</span>{{ $arrow }}</a>
     <h1 id="hero-h"><span>Orchestrate data and AI</span> <span>workflows as code</span></h1>
-    <p class="lead sub rv" style="--i:1">Apache Airflow® is the open‑source platform to author, schedule and monitor workflows, built by the community at the Apache Software Foundation.</p>
+    <p class="lead sub rv" style="--i:1">Apache Airflow® schedules pipelines on time or on data, runs LLM calls and agents as tasks, and shows every run in one UI. Free and open source, at the Apache Software Foundation.</p>
     <div class="ctas rv" style="--i:2">
       <a class="btn btn-primary" href="{{ $start }}">Get started</a>
       <a class="btn btn-secondary" href="{{ $upgrade }}">Upgrade from Airflow 2</a>
     </div>
     <div class="install rv" style="--i:3">
       <div class="seg pmgr" role="group" aria-label="Package manager"><button type="button" aria-pressed="true" data-cmd="pip install apache-airflow">pip</button><button type="button" aria-pressed="false" data-cmd="uv pip install apache-airflow">uv</button></div>
-      <code><span class="pr">$</span><span id="icmd">pip install apache-airflow</span></code><button class="copy" type="button" data-copy-el="icmd" aria-label="Copy the install command">{{ $copyIcons }}</button>
+      <code><span class="pr">$</span><span id="icmd">pip install apache-airflow</span></code>{{ partial "design/copy-button.html" (dict "label" "Copy the install command" "copyEl" "icmd") }}
     </div>
     <p class="hint rv" style="--i:4">For a reproducible install, pin dependencies with a <a class="ilink" href="{{ $docs }}installation/installing-from-pypi.html">constraints file</a>.</p>
     <ul class="chips rv" style="--i:5" aria-label="At a glance">
@@ -162,7 +106,7 @@
     </div>
 
     <div class="panels">
-      <div class="panel a-green" role="tabpanel" id="p-data" aria-labelledby="t-data" tabindex="0">
+      <div class="grid12 panel a-green" role="tabpanel" id="p-data" aria-labelledby="t-data" tabindex="0">
         <div class="ptext">
           <p class="k">Data pipelines</p>
           <h3>Schedule on time, on data, or both</h3>
@@ -203,7 +147,7 @@
         </div>
       </div>
 
-      <div class="panel a-teal" role="tabpanel" id="p-ai" aria-labelledby="t-ai" tabindex="0">
+      <div class="grid12 panel a-teal" role="tabpanel" id="p-ai" aria-labelledby="t-ai" tabindex="0">
         <div class="ptext">
           <p class="k">AI and agents</p>
           <h3>Run LLM calls and agents as tasks</h3>
@@ -215,14 +159,14 @@
           </ul>
           <a class="tlink" href="{{ "docs/apache-airflow-providers-common-ai/stable/index.html" | relURL }}">Common AI provider {{ $arrow }}</a>
         </div>
-        {{ partial "home/code-window.html" (dict
+        {{ partial "design/code-window.html" (dict "class" "pwin"
           "label" "Example code: a Dag that triages a support ticket with an LLM, then waits for approval"
           "dag" "support_triage" "tag" "@task.llm"
-          "code" (highlight (index $sample "triage.py") "python" (printf "%s,hl_lines=16-22" $hl))
+          "src" "home/samples/triage.py" "lang" "python" "hl" "16-22"
           "caption" "<code>@task.llm</code> sends the returned prompt to the model on the connection and returns a <code>Triage</code>.") }}
       </div>
 
-      <div class="panel a-amber" role="tabpanel" id="p-event" aria-labelledby="t-event" tabindex="0">
+      <div class="grid12 panel a-amber" role="tabpanel" id="p-event" aria-labelledby="t-event" tabindex="0">
         <div class="ptext">
           <p class="k">Event-driven</p>
           <h3>Start a run when an event arrives</h3>
@@ -234,14 +178,14 @@
           </ul>
           <a class="tlink" href="{{ $docs }}authoring-and-scheduling/event-scheduling.html">Event-driven scheduling {{ $arrow }}</a>
         </div>
-        {{ partial "home/code-window.html" (dict
+        {{ partial "design/code-window.html" (dict "class" "pwin"
           "label" "Example code: a Dag that runs for each message on a Kafka topic"
           "dag" "process_order" "tag" "AssetWatcher"
-          "code" (highlight (index $sample "on_event.py") "python" (printf "%s,hl_lines=6-10" $hl))
+          "src" "home/samples/on_event.py" "lang" "python" "hl" "6-10"
           "caption" "Each message on the <code>orders</code> topic starts a run of <code>process_order</code>.") }}
       </div>
 
-      <div class="panel a-red" role="tabpanel" id="p-lang" aria-labelledby="t-lang" tabindex="0">
+      <div class="grid12 panel a-red" role="tabpanel" id="p-lang" aria-labelledby="t-lang" tabindex="0">
         <div class="ptext">
           <p class="k">Any language</p>
           <h3>Write Dags and tasks in Go, Java or TypeScript</h3>
@@ -253,14 +197,14 @@
           </ul>
           <a class="tlink" href="{{ $docs }}authoring-and-scheduling/language-sdks/index.html">Non-Python Task SDKs {{ $arrow }}</a>
         </div>
-        {{ partial "home/code-window.html" (dict
+        {{ partial "design/code-window.html" (dict "class" "pwin"
           "label" "Example code: a Dag written in Go"
           "file" "main.go" "tag" "experimental"
-          "code" (highlight (index $sample "main.go") "go" (printf "%s,hl_lines=19-25" $hl))
+          "src" "home/samples/main.go" "lang" "go" "hl" "19-25"
           "caption" "A Go Dag with two tasks, from the Go SDK guide.") }}
       </div>
 
-      <div class="panel a-blue" role="tabpanel" id="p-ops" aria-labelledby="t-ops" tabindex="0">
+      <div class="grid12 panel a-blue" role="tabpanel" id="p-ops" aria-labelledby="t-ops" tabindex="0">
         <div class="ptext">
           <p class="k">Operations</p>
           <h3>Know when a run is late, not only when it fails</h3>
@@ -272,10 +216,10 @@
           </ul>
           <a class="tlink" href="{{ $docs }}howto/deadline-alerts.html">Deadline alerts {{ $arrow }}</a>
         </div>
-        {{ partial "home/code-window.html" (dict
+        {{ partial "design/code-window.html" (dict "class" "pwin"
           "label" "Example code: a Dag that posts to Slack when a run misses its deadline"
           "dag" "nightly_finance" "tag" "DeadlineAlert"
-          "code" (highlight (index $sample "deadline.py") "python" (printf "%s,hl_lines=15-25" $hl))
+          "src" "home/samples/deadline.py" "lang" "python" "hl" "15-25"
           "caption" "If a run hasn't finished an hour after it was queued, Slack gets a message.") }}
       </div>
     </div>
@@ -301,10 +245,10 @@
             <button class="etab" role="tab" id="e-code" aria-controls="ep-code" aria-selected="true"><span class="py" aria-hidden="true"></span>orders.py</button>
             <button class="etab" role="tab" id="e-run" aria-controls="ep-run" aria-selected="false" tabindex="-1">output</button>
           </div>
-          <button class="copy" type="button" data-copy-code="orders-src" aria-label="Copy orders.py">{{ $copyIcons }}<span class="hide-s">Copy</span></button>
+          {{ partial "design/copy-button.html" (dict "label" "Copy orders.py" "copyCode" "orders-src" "text" "Copy") }}
         </div>
         <div class="epane" id="ep-code" role="tabpanel" aria-labelledby="e-code">
-          <div class="code" id="orders-src">{{ highlight (index $sample "orders.py") "python" $hl }}</div>
+          <div class="code" id="orders-src">{{ partial "design/highlight.html" (dict "src" "home/samples/orders.py" "lang" "python") }}</div>
         </div>
         <div class="epane" id="ep-run" role="tabpanel" aria-labelledby="e-run" hidden>
           <div class="term">
@@ -343,7 +287,7 @@
       </figure>
     </div>
 
-    <h2 class="sr">Questions</h2>
+    <h2 class="visually-hidden">Questions</h2>
     <div class="faq">
       <div>
         <h3 class="label">Upgrading from Airflow 2</h3>
@@ -409,7 +353,7 @@
       <li><a href="{{ index . 0 }}"><b>{{ index . 1 }}</b><span>{{ index . 2 }}</span>{{ $arrow }}</a></li>
       {{- end }}
     </ul>
-    <div class="stats">
+    <div class="stats" style="{{ printf "--n: %d" (len .Params.stats.items) | safeCSS }}">
       {{- range .Params.stats.items }}
       <a class="stat a-{{ .accent }}" href="{{ .url }}"><b>{{ .value }}</b><span>{{ .label }}</span></a>
       {{- end }}
@@ -443,47 +387,13 @@
         <a class="btn btn-secondary" href="{{ "docs/" | relURL }}">Read the docs</a>
       </div>
       <div class="shell"><pre><span class="pr">$ </span>pip install apache-airflow
-<span class="pr">$ </span>airflow standalone</pre><button class="copy" type="button" data-copy="pip install apache-airflow&#10;airflow standalone" aria-label="Copy both commands">{{ $copyIcons }}</button></div>
+<span class="pr">$ </span>airflow standalone</pre>{{ partial "design/copy-button.html" (dict "label" "Copy both commands" "copy" "pip install apache-airflow\nairflow standalone") }}</div>
       <p class="hint">Then open <code>localhost:8080</code> and log in as <code>admin</code> with the password Airflow prints. <span class="nowrap">Python {{ $release.python }}</span>.</p>
     </div>
   </div>
 </section>
 </main>
 
-<footer class="foot">
-  <div class="wrap">
-    <div class="fcols">
-      <div class="fbrand">
-        {{- /* Lazy images under display: none are never fetched, so only the current theme's logo loads. */}}
-        <img class="only-light" src="{{ "images/airflow-logo.svg" | relURL }}" alt="Apache Airflow" width="124" height="48" loading="lazy">
-        <img class="only-dark" src="{{ "images/airflow-logo-dark.svg" | relURL }}" alt="Apache Airflow" width="124" height="48" loading="lazy">
-        <p>A platform to author, schedule and monitor workflows. A project of the Apache Software Foundation.</p>
-      </div>
-      <nav class="fcol" aria-labelledby="f-project"><h2 id="f-project" class="label">Project</h2><ul>
-        {{- range $menu }}
-        <li><a href="{{ .href }}"{{ if .external }} target="_blank"{{ end }}>{{ .name }}</a></li>
-        {{- end }}
-      </ul></nav>
-      <nav class="fcol" aria-labelledby="f-elsewhere"><h2 id="f-elsewhere" class="label">Elsewhere</h2><ul>
-        {{- range .Site.Params.links.media }}
-        <li><a href="{{ .url }}">{{ .name }}</a></li>
-        {{- end }}
-      </ul></nav>
-      <nav class="fcol" aria-labelledby="f-asf"><h2 id="f-asf" class="label">The ASF</h2><ul>
-        <li><a href="https://www.apache.org/">Foundation</a></li>
-        {{- range .Site.Params.links.policies }}
-        <li><a href="{{ .url }}">{{ .name }}</a></li>
-        {{- end }}
-        <li><a href="https://www.apache.org/foundation/marks/">Trademarks</a></li>
-      </ul></nav>
-    </div>
-    <div class="legal">
-      <p>Copyright © {{ now.Format "2006" }} The Apache Software Foundation, licensed under the Apache License, Version 2.0. Apache Airflow, Airflow, Apache, Apache Iceberg, Apache Kafka, Apache Spark, the Apache feather logo and the Apache Airflow project logo are either registered trademarks or trademarks of The Apache Software Foundation in the United States and other countries. Other names and logos may be trademarks of their respective owners.</p>
-    </div>
-  </div>
-</footer>
-
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="{{ $js.RelPermalink }}"{{ with $js.Data.Integrity }} integrity="{{ . }}"{{ end }} defer></script>
+{{ partial "design/footer.html" . }}
 </body>
 </html>

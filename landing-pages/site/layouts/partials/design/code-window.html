@@ -17,19 +17,21 @@
  under the License.
 */}}
 {{- /*
-  A code sample in a window, for the home page's use-case tabs.
-  label: aria-label; dag: Dag name in the breadcrumb (or file: a file name in an editor bar);
-  tag: chip on the right; code: highlighted HTML; caption: HTML under the code.
+  A code sample in a window.
+  label: aria-label for the figure; dag: the Dag name in a breadcrumb bar, or file: a file
+  name in an editor bar; tag: a chip on the right; src, lang, hl: the sample, passed to
+  design/highlight.html; caption: HTML under the code; class: extra classes for the wrapper.
 */ -}}
-<div class="pwin glow">
+<div class="{{ with .class }}{{ . }} {{ end }}glow">
   <figure class="win" aria-label="{{ .label }}">
+    <div class="wbar" aria-hidden="true">
+      {{- with .dag }}<img src="{{ "favicons/favicon-32x32.png" | relURL }}" alt="" width="18" height="18"><div class="crumb"><span class="c">Dags</span><span class="sep">/</span><b>{{ . }}</b></div>
+      {{- else }}<span class="dots"><i></i><i></i><i></i></span><span class="title">{{ .file }}</span>
+      {{- end }}<span class="tag">{{ .tag }}</span></div>
     {{- with .dag }}
-    <div class="wbar" aria-hidden="true"><img src="{{ "favicons/favicon-32x32.png" | relURL }}" alt="" width="18" height="18"><div class="crumb"><span class="c">Dags</span><span class="sep">/</span><b>{{ . }}</b></div><span class="tag">{{ $.tag }}</span></div>
     <div class="wtabs" aria-hidden="true"><span>Overview</span><span>Runs</span><span>Tasks</span><span class="on">Code</span></div>
-    {{- else }}
-    <div class="wbar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="title">{{ .file }}</span><span class="tag">{{ .tag }}</span></div>
     {{- end }}
-    <div class="code">{{ .code }}</div>
+    <div class="code">{{ partial "design/highlight.html" . }}</div>
     <figcaption class="wfoot"><span>{{ .caption | safeHTML }}</span><span class="illu">Example</span></figcaption>
   </figure>
 </div>
