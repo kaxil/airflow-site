@@ -310,13 +310,13 @@
       <p class="lead">An API server, a scheduler, a Dag processor and a triggerer around one metadata database. Workers run tasks wherever they fit and report back through the Task Execution API.</p>
     </div>
     <div class="grid12">
-      <div class="dia" role="img" aria-label="Architecture: work comes from Dag bundles, from schedules and events, and from people and tools using the UI, REST API and CLI. The control plane is the Dag processor, scheduler, triggerer and API server around the metadata database. Tasks run on Celery, Kubernetes, Edge workers or AWS, and talk to the API server through the Task Execution API.">
+      <div class="dia" role="img" aria-label="Architecture: work comes from Dag bundles, from schedules and events, and from people and tools using the UI, REST API and CLI. The control plane is the Dag processor, scheduler, triggerer and API server around the metadata database; the Dag processor and triggerer run code Dag authors write. Tasks run on Celery, Kubernetes, Edge workers or AWS, and talk to the API server through the Task Execution API.">
         <div class="layer"><span class="lab label">Work comes from</span>
           <div class="nodes n3"><div class="node"><b>Dag bundles</b>Python, Go, Java, TypeScript or YAML, from Git, a folder or object storage</div><div class="node"><b>Schedules and events</b>cron, assets and message queues</div><div class="node"><b>People and tools</b>UI, REST API, CLI and <code>airflowctl</code></div></div></div>
         <div class="wire"><div class="wl"><svg viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true"><path d="M50 0 C50 22 150 18 150 40 M150 0 V40 M250 0 C250 22 150 18 150 40"/></svg></div></div>
         <div class="layer"><span class="lab label">Control plane</span>
           <div class="engine">
-            <div class="packs"><div class="pk"><b>Dag processor</b>parses bundles</div><div class="pk"><b>Scheduler</b>decides what runs</div><div class="pk"><b>Triggerer</b>waits on events</div><div class="pk"><b>API server</b>UI, REST and Task Execution APIs</div></div>
+            <div class="packs"><div class="pk uc"><b>Dag processor</b>runs your Dag files to parse them</div><div class="pk"><b>Scheduler</b>decides what runs</div><div class="pk uc"><b>Triggerer</b>runs your triggers while tasks wait</div><div class="pk"><b>API server</b>UI, REST and Task Execution APIs</div></div>
             <div class="core"><div class="node"><b>Metadata database</b>PostgreSQL or MySQL</div></div>
           </div></div>
         <div class="wire"><div class="wl"><svg viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><path d="M200 0 C200 22 50 18 50 40 M200 0 C200 22 150 18 150 40 M200 0 C200 22 250 18 250 40 M200 0 C200 22 350 18 350 40"/></svg><em>Task Execution API</em></div></div>
@@ -324,11 +324,11 @@
           <div class="nodes n4"><div class="node"><b>Celery</b>workers on queues</div><div class="node"><b>Kubernetes</b>a pod per task</div><div class="node"><b>Edge</b>remote workers over HTTP</div><div class="node"><b>AWS</b>ECS, Batch and Lambda executors</div></div></div>
       </div>
       <ul class="notesr">
-        <li><b><i class="sw-blue"></i>Workers need no database access</b><p>Task code on workers talks to Airflow through the Task Execution API, so workers can run without credentials for the metadata database.</p></li>
+        <li><b><i class="sw-amber"></i>Your code runs in three places</b><p>Workers, the Dag processor and the triggerer run code Dag authors write; the scheduler and API server never do. Workers also need no database credentials: tasks talk to Airflow through the Task Execution API.</p></li>
         <li><b><i class="sw-green"></i>A version for every run</b><p>With a versioned Dag bundle such as Git, a run uses one version of the code from start to finish, and the UI shows that version's code and graph.</p></li>
         <li><b><i class="sw-teal"></i>Waiting costs no worker slot</b><p>Deferred tasks and asset watchers wait in the triggerer.</p></li>
         <li><b><i class="sw-red"></i>Several executors at once</b><p>Send each task to the executor that suits it, in one deployment, or write your own.</p></li>
-        <li><b><i class="sw-amber"></i>Built to extend</b><p>Provider packages, plugins with React views, custom executors and auth managers.</p></li>
+        <li><b><i class="sw-blue"></i>Built to extend</b><p>Provider packages, plugins with React views, custom executors and auth managers.</p></li>
       </ul>
     </div>
   </div>
@@ -362,7 +362,11 @@
     </div>
     <ul class="posts">
       {{- range first 3 (where .Site.RegularPages "Section" "blog") }}
-      <li><a href="{{ .RelPermalink }}"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time><b>{{ .Title }}</b><span>{{ .Summary | plainify | truncate 140 }}</span></a></li>
+      {{- $names := slice }}{{ range partial "site/blog-authors.html" . }}{{ $names = $names | append .name }}{{ end }}
+      <li><a href="{{ .RelPermalink }}">
+        <span class="pmeta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>{{ with $names }}<span>{{ delimit . ", " }}</span>{{ end }}</span>
+        <span class="pbody"><b>{{ .Title }}</b><span>{{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 300 }}{{ end }}</span></span>
+        {{ $arrow }}</a></li>
       {{- end }}
     </ul>
   </div>
