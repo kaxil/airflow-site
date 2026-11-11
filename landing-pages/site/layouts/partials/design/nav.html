@@ -18,9 +18,12 @@
 */}}
 {{- /* Site navigation and the skip link. Call with the page: {{ partial "design/nav.html" . }} */ -}}
 {{- $menu := partialCached "design/menu.html" . -}}
+{{- /* Every link in the menu, the dropdown's included. */ -}}
+{{- $links := slice -}}
+{{- range $menu }}{{ if .groups }}{{ range .groups }}{{ $links = $links | append .items }}{{ end }}{{ else }}{{ $links = $links | append . }}{{ end }}{{ end -}}
 {{- /* The menu entry for the section this page is in: the longest href the page's URL starts with. */ -}}
 {{- $current := "" -}}
-{{- range $menu -}}
+{{- range $links -}}
   {{- if and (not .external) (ne .href "/") (hasPrefix $.RelPermalink .href) (gt (len .href) (len $current)) -}}
     {{- $current = .href -}}
   {{- end -}}
@@ -34,7 +37,27 @@
     <nav aria-label="Main">
       <ul class="menu">
         {{- range $menu }}
-        <li><a href="{{ .href }}"{{ if .external }} target="_blank"{{ end }}{{ if eq .href $current }} aria-current="{{ if eq .href $.RelPermalink }}page{{ else }}true{{ end }}"{{ end }}>{{ .name }}</a></li>
+        {{- if .groups }}
+        {{- $here := false }}
+        {{- range .groups }}{{ range .items }}{{ if eq .href $current }}{{ $here = true }}{{ end }}{{ end }}{{ end }}
+        <li>
+          <details class="dd{{ if $here }} here{{ end }}">
+            <summary>{{ .name }} {{ partial "design/icon.html" "chevron" }}</summary>
+            <div class="dd-panel{{ if gt (len .groups) 1 }} dd-wide{{ end }}">
+              {{- range .groups }}
+              <div class="dd-group">
+                {{- with .name }}<p class="dh">{{ . }}</p>{{ end }}
+                {{- range .items }}
+                {{ partial "design/menu-a.html" (dict "item" . "current" $current "page" $ "rich" true) }}
+                {{- end }}
+              </div>
+              {{- end }}
+            </div>
+          </details>
+        </li>
+        {{- else }}
+        <li>{{ partial "design/menu-a.html" (dict "item" . "current" $current "page" $) }}</li>
+        {{- end }}
         {{- end }}
       </ul>
     </nav>
@@ -50,10 +73,16 @@
       <details class="mnav">
         <summary aria-label="Menu"><svg class="i b" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/></svg><svg class="i x" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg></summary>
         <div class="mnav-panel">
-          {{- range $menu }}
-          <a href="{{ .href }}"{{ if .external }} target="_blank"{{ end }}{{ if eq .href $current }} aria-current="{{ if eq .href $.RelPermalink }}page{{ else }}true{{ end }}"{{ end }}>{{ .name }}</a>
+          {{- range where $menu "groups" "==" nil }}
+          {{ partial "design/menu-a.html" (dict "item" . "current" $current "page" $) }}
           {{- end }}
           <a href="{{ $github }}">GitHub</a>
+          {{- range where $menu "groups" "!=" nil }}
+          <p class="mh">{{ .name }}</p>
+          {{- range .groups }}{{ range .items }}
+          {{ partial "design/menu-a.html" (dict "item" . "current" $current "page" $) }}
+          {{- end }}{{ end }}
+          {{- end }}
           <a class="btn btn-primary" href="{{ $start }}">Get started</a>
         </div>
       </details>

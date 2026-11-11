@@ -120,4 +120,37 @@ export const initNav = () => {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && menu.open) { menu.open = false; menu.querySelector("summary").focus(); }
   });
+
+  // Menu dropdowns: one open at a time, closed by a click elsewhere or Escape. With a mouse
+  // they also open on hover, and close shortly after the pointer leaves, so a diagonal move
+  // to the panel doesn't close them.
+  const dropdowns = [...nav.querySelectorAll(".menu .dd")];
+  const hover = window.matchMedia("(hover: hover) and (pointer: fine)");
+  dropdowns.forEach((dd) => {
+    let timer;
+    dd.addEventListener("mouseenter", () => {
+      if (!hover.matches) return;
+      clearTimeout(timer);
+      dd.open = true;
+    });
+    dd.addEventListener("mouseleave", () => {
+      if (!hover.matches) return;
+      timer = setTimeout(() => { dd.open = false; }, 200);
+    });
+    // A mouse click on a dropdown the hover already opened would close it; keep it open.
+    // Keyboard activation (detail 0) still toggles.
+    dd.querySelector("summary").addEventListener("click", (e) => {
+      if (hover.matches && dd.open && e.detail > 0) e.preventDefault();
+    });
+  });
+  dropdowns.forEach((dd) => dd.addEventListener("toggle", () => {
+    if (dd.open) dropdowns.forEach((other) => { if (other !== dd) other.open = false; });
+  }));
+  document.addEventListener("click", (e) => {
+    dropdowns.forEach((dd) => { if (dd.open && !dd.contains(e.target)) dd.open = false; });
+  });
+  document.addEventListener("keydown", (e) => {
+    const open = dropdowns.find((dd) => dd.open);
+    if (e.key === "Escape" && open) { open.open = false; open.querySelector("summary").focus(); }
+  });
 };

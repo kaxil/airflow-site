@@ -10,7 +10,11 @@ aliases: ["/survey/"]
 description: "With more than 5,818 responses from 122 countries, this is the largest data engineering survey to date. Conducted annually, the Apache Airflow Survey offers valuable insights into Airflow usage and helps guide our future efforts."
 menu:
   main:
-    weight: 30
+    parent: "community"
+    weight: 13
+    params:
+      group: "Around Airflow"
+      description: "What Airflow users told us"
 ---
 
 ![Airflow Survey 2025](images/Airflow-Survey-2025-Results.png "airflow_survey_2025")

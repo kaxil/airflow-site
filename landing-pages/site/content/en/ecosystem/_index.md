@@ -3,7 +3,11 @@ title: "Ecosystem"
 linkTitle: "Ecosystem"
 menu:
   main:
-    weight: 30
+    parent: "community"
+    weight: 11
+    params:
+      group: "Around Airflow"
+      description: "Tools and managed services"
 ---
 
 

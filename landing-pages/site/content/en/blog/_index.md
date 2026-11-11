@@ -3,5 +3,5 @@ title: "Blog"
 linkTitle: "Blog"
 menu:
   main:
-    weight: 25
+    weight: 50
 ---

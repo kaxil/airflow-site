@@ -119,19 +119,19 @@ no = 'Sorry to hear that. Please <a href="https://github.com/USERNAME/REPOSITORY
 
 [params.links]
 [[params.links.media]]
-    name = "Github"
+    name = "GitHub"
     url = "https://github.com/apache/airflow/"
     iconName = "github-white.svg"
 [[params.links.media]]
     name = "Slack"
-    url = "https://apache-airflow.slack.com/"
+    url = "https://s.apache.org/airflow-slack"
     iconName = "slack.svg"
 [[params.links.media]]
     name = "Stack Overflow"
     url = "https://stackoverflow.com/questions/tagged/airflow/"
     iconName = "stackoverflow.svg"
 [[params.links.media]]
-    name = "Youtube"
+    name = "YouTube"
     url = "https://www.youtube.com/channel/UCSXwxpWZQ7XZ1WL3wqevChA/"
     iconName = "youtube.svg"
 [[params.links.policies]]
@@ -156,10 +156,41 @@ no = 'Sorry to hear that. Please <a href="https://github.com/USERNAME/REPOSITORY
     name = "Code of Conduct"
     url = "/code-of-conduct/"
 
+# The main menu. Pages join it from their front matter (menu.main); entries with
+# parent = "community" form the Community dropdown, in groups named by params.group, and
+# params.description is the line under each name.
 [[menu.main]]
     name = "Registry"
     url = "/registry/"
-    weight = 12
+    weight = 30
+[[menu.main]]
+    identifier = "community"
+    name = "Community"
+    weight = 40
+[[menu.main]]
+    parent = "community"
+    name = "Contribute"
+    url = "https://github.com/apache/airflow/blob/main/contributing-docs/README.rst"
+    weight = 2
+    [menu.main.params]
+        group = "Get involved"
+        description = "Your first pull request"
+[[menu.main]]
+    parent = "community"
+    name = "Dev list"
+    url = "https://lists.apache.org/list.html?dev@airflow.apache.org"
+    weight = 3
+    [menu.main.params]
+        group = "Get involved"
+        description = "Where the project decides"
+[[menu.main]]
+    parent = "community"
+    name = "Slack"
+    url = "https://s.apache.org/airflow-slack"
+    weight = 4
+    [menu.main.params]
+        group = "Get involved"
+        description = "Ask and help"
 
 [related]
 threshold = 50.0

@@ -4,7 +4,11 @@ date: 2020-08-08T05:30:20+05:30
 draft: false
 menu:
   main:
-    weight: 25
+    parent: "community"
+    weight: 12
+    params:
+      group: "Around Airflow"
+      description: "Releases and project news"
 
 ---
 

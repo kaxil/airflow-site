@@ -17,16 +17,27 @@
  under the License.
 */}}
 {{- /*
-  The main menu from the site config, as a list of dicts (name, href, external). Links to
-  other hosts open in a new tab.
+  The main menu from the site config and page front matter, as a list of dicts from
+  design/menu-link.html. An entry with children (the Community dropdown) also has id and
+  groups: a list of dicts (name, items), in the order the children's params.group first
+  appear.
   It depends only on the site, so call it cached: {{ $menu := partialCached "design/menu.html" . }}
 */ -}}
 {{- $menu := slice -}}
-{{- $siteHost := (urls.Parse .Site.Params.Baseurl).Host -}}
-{{- range .Site.Menus.main -}}
-  {{- $href := .URL | relLangURL -}}
-  {{- with .Page }}{{ $href = .RelPermalink }}{{ end -}}
-  {{- $external := ne (urls.Parse .URL).Host $siteHost -}}
-  {{- $menu = $menu | append (dict "name" .Name "href" $href "external" $external) -}}
+{{- range site.Menus.main -}}
+  {{- $item := partial "design/menu-link.html" . -}}
+  {{- if .HasChildren -}}
+    {{- $names := slice -}}
+    {{- $byName := dict -}}
+    {{- range .Children -}}
+      {{- $g := .Params.group | default "" -}}
+      {{- if not (in $names $g) }}{{ $names = $names | append $g }}{{ end -}}
+      {{- $byName = merge $byName (dict $g ((index $byName $g | default slice) | append (partial "design/menu-link.html" .))) -}}
+    {{- end -}}
+    {{- $groups := slice -}}
+    {{- range $names }}{{ $groups = $groups | append (dict "name" . "items" (index $byName .)) }}{{ end -}}
+    {{- $item = merge $item (dict "id" .Identifier "groups" $groups) -}}
+  {{- end -}}
+  {{- $menu = $menu | append $item -}}
 {{- end -}}
 {{- return $menu -}}

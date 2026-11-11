@@ -26,15 +26,28 @@
         <img class="only-light" src="{{ "images/airflow-logo.svg" | relURL }}" alt="Apache Airflow" width="124" height="48" loading="lazy">
         <img class="only-dark" src="{{ "images/airflow-logo-dark.svg" | relURL }}" alt="Apache Airflow" width="124" height="48" loading="lazy">
         <p>Workflow orchestration for data and AI. A project of the Apache Software Foundation.</p>
+        <a class="btn btn-secondary btn-sm" href="{{ "community/" | relURL }}">Join the community</a>
       </div>
       <nav class="fcol" aria-labelledby="f-project"><h2 id="f-project" class="label">Project</h2><ul>
-        {{- range $menu }}
+        {{- range where $menu "groups" "==" nil }}
         <li><a href="{{ .href }}"{{ if .external }} target="_blank"{{ end }}>{{ .name }}</a></li>
         {{- end }}
       </ul></nav>
+      {{- /* The menu's dropdowns, each as a column of its links. */}}
+      {{- $inMenu := slice }}
+      {{- range where $menu "groups" "!=" nil }}
+      <nav class="fcol" aria-labelledby="f-{{ .id }}"><h2 id="f-{{ .id }}" class="label">{{ .name }}</h2><ul>
+        {{- range .groups }}{{ range .items }}
+        {{- $inMenu = $inMenu | append .href }}
+        <li><a href="{{ .href }}"{{ if .external }} target="_blank"{{ end }}>{{ .name }}</a></li>
+        {{- end }}{{ end }}
+      </ul></nav>
+      {{- end }}
       <nav class="fcol" aria-labelledby="f-elsewhere"><h2 id="f-elsewhere" class="label">Elsewhere</h2><ul>
         {{- range .Site.Params.links.media }}
+        {{- if not (in $inMenu .url) }}
         <li><a href="{{ .url }}">{{ .name }}</a></li>
+        {{- end }}
         {{- end }}
       </ul></nav>
       <nav class="fcol" aria-labelledby="f-asf"><h2 id="f-asf" class="label">The ASF</h2><ul>
