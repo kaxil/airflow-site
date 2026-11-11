@@ -16,51 +16,31 @@
  specific language governing permissions and limitations
  under the License.
 */}}
-{{- /* Site footer, and the live region copy buttons announce into. Call with the page. */ -}}
-{{- $menu := partialCached "design/menu.html" . -}}
+{{- /* Site footer, and the live region copy buttons announce into. Call with the page.
+  One row of links (the project's channels, then the ASF's), then the legal line. The nav
+  carries the site's own pages. */ -}}
 <footer class="foot">
   <div class="wrap">
-    <div class="grid12 fcols">
-      <div class="fbrand">
-        {{- /* Lazy images under display: none are never fetched, so only the current theme's logo loads. */}}
-        <img class="only-light" src="{{ "images/airflow-logo.svg" | relURL }}" alt="Apache Airflow" width="124" height="48" loading="lazy">
-        <img class="only-dark" src="{{ "images/airflow-logo-dark.svg" | relURL }}" alt="Apache Airflow" width="124" height="48" loading="lazy">
-        <p>Workflow orchestration for data and AI. A project of the Apache Software Foundation.</p>
-        <a class="btn btn-secondary btn-sm" href="{{ "community/" | relURL }}">Join the community</a>
-      </div>
-      <nav class="fcol" aria-labelledby="f-project"><h2 id="f-project" class="label">Project</h2><ul>
-        {{- range where $menu "groups" "==" nil }}
-        <li><a href="{{ .href }}"{{ if .external }} target="_blank"{{ end }}>{{ .name }}</a></li>
-        {{- end }}
-      </ul></nav>
-      {{- /* The menu's dropdowns, each as a column of its links. */}}
-      {{- $inMenu := slice }}
-      {{- range where $menu "groups" "!=" nil }}
-      <nav class="fcol" aria-labelledby="f-{{ .id }}"><h2 id="f-{{ .id }}" class="label">{{ .name }}</h2><ul>
-        {{- range .groups }}{{ range .items }}
-        {{- $inMenu = $inMenu | append .href }}
-        <li><a href="{{ .href }}"{{ if .external }} target="_blank"{{ end }}>{{ .name }}</a></li>
-        {{- end }}{{ end }}
-      </ul></nav>
-      {{- end }}
-      <nav class="fcol" aria-labelledby="f-elsewhere"><h2 id="f-elsewhere" class="label">Elsewhere</h2><ul>
+    <div class="frow">
+      <nav class="flinks" aria-label="Apache Airflow elsewhere">
+        <a class="fbrand" href="{{ site.Home.RelPermalink }}">
+          {{- /* Lazy images under display: none are never fetched, so only the current theme's logo loads. */}}
+          <img class="only-light" src="{{ "images/airflow-logo.svg" | relURL }}" alt="Apache Airflow home" width="73" height="28" loading="lazy">
+          <img class="only-dark" src="{{ "images/airflow-logo-dark.svg" | relURL }}" alt="Apache Airflow home" width="73" height="28" loading="lazy">
+        </a>
         {{- range .Site.Params.links.media }}
-        {{- if not (in $inMenu .url) }}
-        <li><a href="{{ .url }}">{{ .name }}</a></li>
+        <a href="{{ .url }}">{{ .name }}</a>
         {{- end }}
-        {{- end }}
-      </ul></nav>
-      <nav class="fcol" aria-labelledby="f-asf"><h2 id="f-asf" class="label">The ASF</h2><ul>
-        <li><a href="https://www.apache.org/">Foundation</a></li>
+      </nav>
+      <nav class="flinks" aria-label="The Apache Software Foundation">
+        <a href="https://www.apache.org/">Foundation</a>
         {{- range .Site.Params.links.policies }}
-        <li><a href="{{ .url }}">{{ .name }}</a></li>
+        <a href="{{ .url }}">{{ .name }}</a>
         {{- end }}
-        <li><a href="https://www.apache.org/foundation/marks/">Trademarks</a></li>
-      </ul></nav>
+        <a href="https://www.apache.org/foundation/marks/">Trademarks</a>
+      </nav>
     </div>
-    <div class="legal">
-      <p>Copyright © {{ now.Format "2006" }} The Apache Software Foundation, licensed under the Apache License, Version 2.0. Apache Airflow, Airflow, Apache, Apache Kafka, Apache Spark, the Apache feather logo and the Apache Airflow project logo are either registered trademarks or trademarks of The Apache Software Foundation in the United States and other countries. Other names and logos may be trademarks of their respective owners.</p>
-    </div>
+    <p class="legal">Copyright © {{ now.Format "2006" }} The Apache Software Foundation, licensed under the Apache License, Version 2.0. Apache Airflow, Airflow, Apache, Apache Kafka, Apache Spark, the Apache feather logo and the Apache Airflow project logo are either registered trademarks or trademarks of The Apache Software Foundation in the United States and other countries. Other names and logos may be trademarks of their respective owners.</p>
   </div>
 </footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
