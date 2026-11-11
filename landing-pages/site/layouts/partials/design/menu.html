@@ -17,8 +17,8 @@
  under the License.
 */}}
 {{- /*
-  The main menu from the site config, as a list of dicts (name, href, external), with
-  the same links and new-tab rule as the site navbar (partials/navbar.html).
+  The main menu from the site config, as a list of dicts (name, href, external). Links to
+  other hosts open in a new tab.
   It depends only on the site, so call it cached: {{ $menu := partialCached "design/menu.html" . }}
 */ -}}
 {{- $menu := slice -}}

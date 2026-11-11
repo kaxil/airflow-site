@@ -36,6 +36,7 @@
   transition: transform .15s ease, background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
 
   &:hover { transform: translateY(-2px); }
+  &[hidden] { display: none; }
 }
 
 .btn-primary {
@@ -77,14 +78,7 @@
   &:hover .i { transform: translateX(2px); }
 }
 
-.ilink {
-  color: var(--link);
-  text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
-  text-underline-offset: 3px;
-
-  &:hover { text-decoration-color: currentcolor; }
-}
+.ilink { @include text-link; }
 
 .seg {
   display: inline-flex;
@@ -261,7 +255,7 @@
   padding: 0 8px;
   border-radius: 999px;
   font: 500 12px/1 var(--mono);
-  color: var(--acc);
+  color: var(--acc-text);
   background: color-mix(in srgb, var(--acc) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--acc) 35%, transparent);
   white-space: nowrap;
@@ -380,41 +374,7 @@
     user-select: none;
   }
 
-  .k,
-  .kn,
-  .kc,
-  .kd,
-  .kr,
-  .ow { color: var(--tok-kw); }
-
-  .s,
-  .s1,
-  .s2,
-  .sa,
-  .sd,
-  .dl,
-  .si { color: var(--tok-str); }
-
-  .nd { color: var(--tok-dec); }
-
-  .nf,
-  .fm { color: var(--tok-fn); }
-
-  .nc,
-  .nb,
-  .bp,
-  .kt { color: var(--tok-ty); }
-
-  .c,
-  .c1,
-  .cm {
-    color: var(--tok-cm);
-    font-style: italic;
-  }
-
-  .m,
-  .mi,
-  .mf { color: var(--tok-num); }
+  @include chroma-tokens;
 }
 
 .term {

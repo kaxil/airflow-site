@@ -204,6 +204,12 @@ li { text-wrap: pretty; }
   stroke-linejoin: round;
 }
 
+// A filled mark, such as a brand logo, rather than a stroked line icon.
+.i-fill {
+  fill: currentcolor;
+  stroke: none;
+}
+
 @media (max-width: 560px) {
   .hide-s { display: none !important; }
 }

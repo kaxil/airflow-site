@@ -121,6 +121,10 @@ jobs:
             echo "No previous theme packages found"
           fi
       - name: 🔧 Build site
+        env:
+          # The pages built with the design system add the staging watermark themselves; see
+          # landing-pages/site/layouts/partials/design/head.html.
+          HUGO_PARAMS_STAGING: ${{ github.ref == 'refs/heads/staging' }}
         run: |
           /mnt/airflow-site/site.sh build-site
       - name: 📦 Restore previous sphinx_airflow_theme packages

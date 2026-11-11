@@ -3,27 +3,16 @@ title: "Infrastructure Management"
 linkTitle: "Infrastructure Management"
 usecasedescription:
     text: "With Airflow you can spin up, manage and tear down your infrastructure at the exact time you need it."
-logo: "infrastructure-management.png"
 blocktype: use-case
 ---
 
-<div style="display: flex; justify-content: center; align-items: center;">
-
 # Use Airflow for Infrastructure Management
-
-</div>
 
 Airflow can interact with any API, which makes it a great tool to manage your infrastructure, such as Kubernetes or Spark clusters running in any cloud. As of Airflow 2.7, the setup/teardown feature is available, a special type of task with intelligent behavior to spin up and tear down infrastructure at the exact time you need it.
 
 Infrastructure management is often needed within the context of other use cases, such as MLOps, or implementing data quality checks. This video shows an example of how it might be used for an MLOps pipeline. You can find the code shown in this example [here](https://github.com/astronomer/use-case-setup-teardown-data-quality).
 
-<div id="videoContainer" style="display: flex; justify-content: center; align-items: center; border: 2px solid #ccc; width: 75%; margin: auto; padding: 20px;">
-    <a href="https://www.youtube.com/embed/JkURWnl76GQ?autoplay=1">
-        <img id="videoPlaceholder" src="/usecase-video-placeholders/placeholder_infra_video.png" style="cursor: pointer; width: 100%; max-width: 560px;" alt="Click to play a one minute video showing the use case" title="Click to play video"/>
-    </a>
-</div>
-
-</br>
+{{< usecase-video id="JkURWnl76GQ" placeholder="placeholder_infra_video.png" >}}
 
 ## Why use Airflow for Infrastructure Management
 

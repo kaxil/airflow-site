@@ -188,6 +188,4 @@ posts = "/:year/:month/:title/"
       unsafe = true
 
 [taxonomies]
-    category = "categories"
     tag = "tags"
-    blocktype = "blocktype"

@@ -17,104 +17,44 @@
  * under the License.
  */
 
+// Filters the meetup groups that layouts/meetups/list.html renders as the reader types in the
+// search box, and shows them a page at a time behind the "Show more" button. Without this
+// script every group shows.
+const PAGE_SIZE = 8;
 
 const runMeetups = () => {
   const root = document.querySelector(".meetups");
   if (!root) {
     return;
   }
-  const templateText = root.querySelector("#meetup-template").innerText;
-  const templateElement = document.createElement("div");
-  templateElement.innerHTML = templateText;
-
-  const listItems = root.querySelector(".list-items");
+  const items = Array.from(root.querySelectorAll(".list-items > li"));
   const searchBox = root.querySelector("[type='search']");
   const moreButton = root.querySelector(".more");
+  const empty = root.querySelector(".mt-empty");
+  let shown = PAGE_SIZE;
 
-  let currentPage = 1;
-  let currentQuery = "";
-  const maxItemsOnPage = window.innerWidth < 1920 ? 8 : 10;
-
-  fetch("/meetups.json")
-    .then((response) => response.json())
-    .then((allMeetups) => {
-
-      const setMoreButtonVisibility = (visible) => {
-        moreButton.style.display = visible ? "" : "none";
-      };
-
-      setMoreButtonVisibility(true);
-
-      const sortByIndex = (a, b) => {
-        return a.index - b.index;
-      };
-
-      const createElement = (item) => {
-        const element = templateElement.cloneNode(true);
-        element.querySelector('[data-name="location"]').innerHTML = `${item.city}<br/>${item.country}`;
-        element.querySelector('[data-name="members-count"]').innerText = `${item.members} members`;
-        element.querySelector("a").href = item.url;
-
-        return element.firstElementChild;
-      };
-
-      const setItems = (items) => {
-        if (items.length === 0) {
-          listItems.innerText = "No items";
-        } else {
-          while (listItems.firstChild) {
-            listItems.removeChild(listItems.firstChild);
-          }
-          items.forEach((item) => {
-            const element = createElement(item);
-            listItems.append(element);
-          });
-        }
-      };
-
-      const showItems = (keyword, page) => {
-        const showMoreButtonIfNeeded = (meetups) => {
-          setMoreButtonVisibility(meetups.length > (page * maxItemsOnPage));
-        };
-
-        const filterMatchingItems = (meetups) => {
-          if (!keyword) {
-            return meetups;
-          }
-          return meetups.filter((meetup) =>
-            meetup.city.toLowerCase().indexOf(keyword.toLowerCase()) >= 0 ||
-            meetup.country.toLowerCase().indexOf(keyword.toLowerCase()) >= 0 ||
-            (meetup.continent && meetup.continent.toLowerCase().indexOf(keyword.toLowerCase()) >= 0)
-          );
-        };
-
-        const filterVisible = (meetups) => {
-          meetups.sort(sortByIndex);
-          return meetups.slice(0, page * maxItemsOnPage);
-        };
-        const matchingItems = filterMatchingItems(allMeetups);
-        const visibleItems = filterVisible(matchingItems);
-        setItems(visibleItems);
-        showMoreButtonIfNeeded(matchingItems);
-      };
-
-      const setSearchQuery = (keyword) => {
-        currentQuery = keyword;
-        showItems(currentQuery, currentPage);
-      };
-
-      searchBox.addEventListener("keyup", () => {
-        currentPage = 1;
-        setSearchQuery(searchBox.value);
-      });
-
-      moreButton.addEventListener("click", () => {
-        currentPage = currentPage + 1;
-        setSearchQuery(searchBox.value);
-      });
-
-      setSearchQuery("");
+  const update = () => {
+    const query = searchBox.value.trim().toLowerCase();
+    const matching = items.filter((item) => item.dataset.search.includes(query));
+    items.forEach((item) => {
+      item.hidden = true;
     });
+    matching.slice(0, shown).forEach((item) => {
+      item.hidden = false;
+    });
+    moreButton.hidden = matching.length <= shown;
+    empty.hidden = matching.length > 0;
+  };
+
+  searchBox.addEventListener("input", () => {
+    shown = PAGE_SIZE;
+    update();
+  });
+  moreButton.addEventListener("click", () => {
+    shown += PAGE_SIZE;
+    update();
+  });
+  update();
 };
 
 runMeetups();

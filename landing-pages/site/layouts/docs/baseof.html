@@ -16,38 +16,7 @@
  specific language governing permissions and limitations
  under the License.
 */}}
-
-<!doctype html>
-<html lang="{{ .Site.Language.Lang }}" class="no-js">
-<head>
-    {{ partial "head.html" . }}
-</head>
-<body class="td-{{ .Kind }}">
-<a href="#main-content" class="skip-link">Skip to main content</a>
-<header>
-    {{ partial "navbar.html" . }}
-</header>
-<div class="roadmap container-fluid td-default base-layout">
-    <div class="d-flex">
-        <main id="main-content" class="col-12 col-md-9 col-xl-8 mx-auto" role="main">
-            {{ block "main" . }}{{ end }}
-        </main>
-    </div>
-<div class="base-layout--button">
-    <div class="base-layout--scrollButton">
-        {{ partial "scroll-to-top" . }}
-    </div>
-    <div class="base-layout--suggestButton">
-        {{ partial "suggest-change" . }}
-    </div>
-</div>
-</div>
-</div>
-{{ partialCached "footer.html" . }}
-{{ partial "scripts.html" . }}
-</body>
-{{ $script := .Site.Data.webpack.main }}
-{{ with $script.js }}
-    <script src="{{ relURL . }}"></script>
-{{ end }}
-</html>
+{{- /* Same as _default/baseof.html; it exists to win over the Docsy theme's docs/baseof.html. */ -}}
+{{ partial "site/frame-open.html" . }}
+{{ block "main" . }}{{ end }}
+{{ partial "site/frame-close.html" . }}

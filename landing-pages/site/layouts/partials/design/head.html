@@ -36,3 +36,8 @@
 <link rel="preload" href="{{ "external/fonts/JetBrainsMono-normal-400_600.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{{ $css.RelPermalink }}"{{ with $css.Data.Integrity }} integrity="{{ . }}"{{ end }}>
 <script src="{{ $js.RelPermalink }}"{{ with $js.Data.Integrity }} integrity="{{ . }}"{{ end }} defer></script>
+{{- /* Staging builds carry a watermark: .github/workflows/build.yml sets HUGO_PARAMS_STAGING on
+  the staging branch, and add_watermark.py puts the image at /images/staging.png. */}}
+{{- if eq (printf "%v" site.Params.staging) "true" }}
+<style>body::after{content:"";position:fixed;inset:0;z-index:2000;pointer-events:none;background:url({{ "images/staging.png" | relURL }}) repeat center;opacity:.2}[data-bs-theme=dark] body::after{filter:invert(1) brightness(2)}</style>
+{{- end }}

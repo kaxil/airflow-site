@@ -1,137 +1,70 @@
 {{/*
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
-    */}}
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+*/}}
+{{- /*
+  /community/: the ways to join (content/en/community/_index.html), the resources
+  (resources.html), and the PMC and committer lists from data/. The webpack bundle
+  (landing-pages/src) shuffles both lists (#pmc-container, #committers-container), adds their
+  "Show more" buttons, and highlights the current section in .wy-nav-side-toc.
+*/ -}}
+{{ define "main" }}
+{{ partial "site/page-head.html" (dict "page" . "lead" "The Apache Airflow® community has tens of thousands of active members who help each other develop the platform, solve problems, and share best practices. There are many ways to get involved.") }}
+{{- $sections := slice
+  (dict "id" "join-the-community" "title" "Join the community!" "content" .Content)
+  (dict "id" "community-resources" "title" "Resources" "content" (.GetPage "resources").Content)
+  (dict "id" "project-management-committee" "title" "Project Management Committee" "people" site.Data.pmc "list" "pmc-container" "button" "show-more-pmcs")
+  (dict "id" "committers" "title" "Committers" "people" site.Data.committers "list" "committers-container" "button" "show-more-committers") }}
+<section class="page-body cm-body">
+  <div class="wrap page-cols with-aside">
+    <aside class="page-aside">
+      <nav class="toc wy-nav-side-toc cm-toc" aria-labelledby="toc-h">
+        <p class="label" id="toc-h">On this page</p>
+        <ul>
+          {{- range $sections }}
+          <li><a href="#{{ .id }}">{{ .title }}</a></li>
+          {{- end }}
+        </ul>
+      </nav>
+    </aside>
 
-    {{ define "main" }}
-    <div class="desktop-only">
-        <div class="roadmap container-fluid td-default base-layout">
-            <div class="d-flex">
-                <main class="col-12 col-md-9 col-xl-8" role="main">
-                    <div class="community--header-container">
-                        <h1 class="page-header">Community</h1>
-                        <p class="page-subtitle">
-                            The Apache Airflow&#174; community has tens of thousands of active members who help each other
-                            develop the platform, solve problems, and share best practices. There are many ways to get
-                            involved.
-                        </p>
-                        <div class="section" id="join-the-community">
-                            <h2 class="community--header-join">Join the community!</h2>
-                            {{ with .Content }}
-                            <div class="no-width-restriction">
-                                {{ . }}
-                            </div>
-                            {{ end }}
-                        </div>
-                    </div>
-                    <div class="section" id="community-resources">
-                        <h2 class="community--resources-header">Resources</h2>
-                        {{ with .GetPage "resources" }}{{ .Content }}
-                        {{ end }}
-                    </div>
-                    <div class="section" id="project-management-committee">
-                        <h2 class="community--committers-header large-margin">Project Management Committee</h2>
-                        <div id="pmc-container" class="list-items">
-                            {{ range .Site.Data.pmc }}
-                            <div class="list-item">
-                                {{ partial "boxes/committer" . }}
-                            </div>
-                            {{ end }}
-                        </div>
-                        <div class="show-more-button">
-                            {{ partial "buttons/button-filled" (dict "text" "Show more" "id" "show-more-pmcs")}}
-                        </div>
-                    </div>
-                    <div class="section" id="committers">
-                        <h2 class="community--committers-header">Committers</h2>
-                        <div id="committers-container" class="list-items">
-                            {{ range .Site.Data.committers }}
-                            <div class="list-item">
-                                {{ partial "boxes/committer" . }}
-                            </div>
-                            {{ end }}
-                        </div>
-                        <div class="show-more-button">
-                            {{ partial "buttons/button-filled" (dict "text" "Show more" "id" "show-more-committers")}}
-                        </div>
-                    </div>
-                </main>
-
-                <nav class="wy-nav-side-toc">
-                    <div class="wy-menu-vertical">
-                        <ul>
-                            <li><a class="reference internal" href="#join-the-community">Join the community!</a></li>
-                            <li><a class="reference internal" href="#community-resources">Resources</a></li>
-                            <li><a class="reference internal" href="#project-management-committee">Project Management
-                                    Committee</a></li>
-                            <li><a class="reference internal" href="#committers">Committers</a></li>
-                        </ul>
-                    </div>
-                </nav>
-            </div>
+    <div class="cm-main">
+      {{- range $sections }}
+      <section class="cm-sec" id="{{ .id }}" aria-labelledby="{{ .id }}-h">
+        {{- if .people }}
+        <div class="cm-sec-head">
+          <h2 class="h-section" id="{{ .id }}-h">{{ .title }}</h2>
+          <p class="meta">{{ len .people }} people</p>
         </div>
+        <ul id="{{ .list }}" class="cards cm-people">
+          {{- range .people }}
+          {{ partial "boxes/committer.html" . }}
+          {{- end }}
+        </ul>
+        <div class="more-row"><button id="{{ .button }}" class="btn btn-secondary" type="button" hidden>Show more</button></div>
+        {{- else }}
+        <h2 class="h-section" id="{{ .id }}-h">{{ .title }}</h2>
+        {{ .content }}
+        {{- end }}
+      </section>
+      {{- end }}
+
+      {{ partial "site/edit-link.html" . }}
     </div>
-
-    <div class="no-desktop">
-        <div class="community--header-container">
-            <h1 class="page-header">Community</h1>
-            <p class="page-subtitle">
-                The Apache Airflow&#174; community has tens of thousands of active members who help each other develop the
-                platform, solve problems, and share best practices. There are many ways to get involved.
-            </p>
-            <div class="section" id="join-the-community">
-                <h2 class="community--header-join">Join the community!</h2>
-                {{ with .Content }}
-                <div class="no-width-restriction">
-                    {{ . }}
-                </div>
-                {{ end }}
-            </div>
-        </div>
-        <div class="section">
-            <h2 class="community--resources-header">Resources</h2>
-            {{ with .GetPage "resources" }}{{ .Content }}
-            {{ end }}
-        </div>
-        <div class="section">
-            <h2 class="community--committers-header large-margin">Project Management Committee</h2>
-            <div id="pmc-container-no-desktop" class="list-items">
-                {{ range .Site.Data.pmc }}
-                <div class="list-item">
-                    {{ partial "boxes/committer" . }}
-                </div>
-                {{ end }}
-            </div>
-            <div class="show-more-button">
-                {{ partial "buttons/button-filled" (dict "text" "Show more" "id" "show-more-pmcs-no-desktop")}}
-            </div>
-        </div>
-        <div class="section">
-            <h2 class="community--committers-header">Committers</h2>
-            <div id="committers-container-no-desktop" class="list-items">
-                {{ range .Site.Data.committers }}
-                <div class="list-item">
-                    {{ partial "boxes/committer" . }}
-                </div>
-                {{ end }}
-            </div>
-            <div class="show-more-button">
-                {{ partial "buttons/button-filled" (dict "text" "Show more" "id" "show-more-committers-no-desktop")}}
-            </div>
-        </div>
-    </div>
-    {{ end }}
+  </div>
+</section>
+{{ end }}

@@ -1,0 +1,161 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+// /community/ (layouts/community/list.html): the side table of contents, the groups of ways to
+// join, and the PMC and committer lists.
+
+.cm-body .page-aside {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.cm-main {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.cm-sec {
+  padding: 0;
+
+  + .cm-sec { margin-top: 80px; }
+}
+
+.cm-sec-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin-bottom: 32px;
+
+  .h-section { margin: 0; }
+}
+
+// The two groups of ways to join: contributors and users.
+.cm-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px var(--gutter);
+}
+
+.cm-group {
+  padding: 0;
+  min-width: 0;
+
+  > h3 {
+    margin-bottom: 12px;
+    @include label;
+  }
+}
+
+// The PMC and committer lists. The columns are wide enough for most names on two lines.
+.cm-people {
+  --card-min: 260px;
+
+  gap: 12px;
+}
+
+.cm-person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  transition: border-color .15s ease;
+
+  &:hover { border-color: var(--line-3); }
+
+  .meta {
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+  }
+}
+
+.cm-avatar {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+
+.cm-person-t {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.cm-person-name {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.cm-person-in {
+  color: var(--link);
+  font-size: 13px;
+}
+
+@media (max-width: $tablet) {
+  .cm-body .page-aside,
+  .cm-main { grid-column: 1; }
+
+  .cm-main { grid-row: 2; }
+
+  // The table of contents sits above the content as a row of links.
+  .cm-toc ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-left: 0;
+  }
+
+  .cm-toc a,
+  .cm-toc .current > a {
+    margin: 0;
+    padding: 6px 12px;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+  }
+}
+
+@media (max-width: $phone) {
+  .cm-groups { grid-template-columns: minmax(0, 1fr); }
+
+  .cm-sec + .cm-sec { margin-top: 56px; }
+}
+
+@media (max-width: 420px) {
+  .cm-people { grid-template-columns: minmax(0, 1fr); }
+}
+
+// A page inside /community/ (layouts/community/single.html).
+.cm-single { max-width: $measure; }
+
+.cm-back { margin: 32px 0 0; }

@@ -17,16 +17,12 @@
  under the License.
 */}}
 
-<div class="mt-5">
-    <p class="bodytext__medium--greyish-brown font-weight-500 mb-2">Share</p>
-    <div class="share-section--icons-wrapper">
-        <div class="share-section--icon"
-             onclick="window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${window.location.href}`,'targetWindow', `toolbar=no, location=no, status=no, menubar=no, directories=no, scrollbars=no, resizable=no, centerscreen=yes, chrome=yes, width=750, height=600, top=${window.outerHeight / 2 + (window.screenY || window.screenTop || 0) - 300} left=${window.outerWidth / 2 + (window.screenX || window.screenLeft || 0) - 375}`); return false;">
-            {{ with resources.Get "icons/linkedin-small.svg" }}{{ .Content | safeHTML }}{{ end }}
-        </div>
-        <div class="share-section--icon"
-             onclick="window.open(`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`,'targetWindow', `toolbar=no, location=no, status=no, menubar=no, directories=no, scrollbars=no, resizable=no, centerscreen=yes, chrome=yes, width=550, height=400, top=${window.outerHeight / 2 + (window.screenY || window.screenTop || 0) - 200} left=${window.outerWidth / 2 + (window.screenX || window.screenLeft || 0) - 275}`); return false;">
-            {{ with resources.Get "icons/facebook-small.svg" }}{{ .Content | safeHTML }}{{ end }}
-        </div>
-    </div>
+{{- /* Links to share a blog post on LinkedIn and Facebook. Call with the post. */ -}}
+{{- $url := printf "%s%s" (strings.TrimSuffix "/" site.Params.canonicalBaseURL) .RelPermalink -}}
+<div class="post-share">
+  <p class="label" id="share-h">Share</p>
+  <ul aria-labelledby="share-h">
+    <li><a class="btn btn-secondary btn-sm" href="https://www.linkedin.com/sharing/share-offsite/?url={{ $url }}" target="_blank" rel="noopener">LinkedIn</a></li>
+    <li><a class="btn btn-secondary btn-sm" href="https://www.facebook.com/sharer/sharer.php?u={{ $url }}" target="_blank" rel="noopener">Facebook</a></li>
+  </ul>
 </div>

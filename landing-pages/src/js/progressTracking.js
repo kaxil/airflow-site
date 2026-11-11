@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import throttle from "lodash/debounce";
+import throttle from "lodash/throttle";
 
 const runProgressTracking = () => {
   const sideNavRoot = document.querySelector(".wy-nav-side-toc");
@@ -25,36 +25,45 @@ const runProgressTracking = () => {
     return;
   }
 
-  const navTocElements = Array.from(sideNavRoot.querySelectorAll("li"));
-  const navItems = navTocElements.map((element) => {
-    const hash = element.querySelector("a").hash;
-    const target = hash.substr(1);
-    let targetElement;
-    if (target) {
-      targetElement = document.getElementById(target);
-    } else {
-      targetElement = document.body;
+  // An entry for a heading level the page skips has no link of its own.
+  const navTocElements = Array.from(sideNavRoot.querySelectorAll("li")).filter((li) => li.querySelector(":scope > a"));
+  const targetOf = (hash) => {
+    if (!hash) {
+      return document.body;
     }
-    return {navElement: element, targetElement};
-  });
+    try {
+      return document.getElementById(decodeURIComponent(hash.substr(1)));
+    } catch {
+      // A hash with a "%" that isn't an escape.
+      return document.getElementById(hash.substr(1));
+    }
+  };
+  // Entries whose heading isn't on the page are left out.
+  const navItems = navTocElements
+    .map((element) => ({navElement: element, targetElement: targetOf(element.querySelector(":scope > a").hash)}))
+    .filter((item) => item.targetElement);
+  if (navItems.length === 0) {
+    return;
+  }
 
-  const navbarHeight = window.document.querySelector("header > nav").offsetHeight;
+  // "header > nav" is the docs theme's navbar; header.nav is the website's.
+  const navbar = document.querySelector("header > nav, header.nav");
+  const navbarHeight = navbar ? navbar.offsetHeight : 0;
 
   const handleActiveSection = () => {
-    // The array should be sorted according to the position of the elements on the page
-    navItems.sort((a, b) => a.targetElement.offsetTop - b.targetElement.offsetTop);
-
-    let currentActiveIndex;
-
-    // If the top of the window is above the first element, select the first element
-    if (navItems[0].targetElement.offsetTop + navbarHeight > window.scrollY) {
-      currentActiveIndex = 0;
-    // If the top of the window is under the last element, select the last element
-    } else if (navItems[navItems.length - 1].targetElement.offsetTop + navbarHeight < window.scrollY) {
+    // The current section is the last one whose top has scrolled up to just below the sticky
+    // nav. Links scroll their target 80px from the top (the site's scroll-padding-top), hence
+    // the 40px of room. Once scrolled to the bottom of the page, the last section.
+    const line = navbarHeight + 40;
+    const atBottom = window.scrollY > 0 && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+    let currentActiveIndex = 0;
+    navItems.forEach((item, index) => {
+      if (item.targetElement.getBoundingClientRect().top <= line) {
+        currentActiveIndex = index;
+      }
+    });
+    if (atBottom) {
       currentActiveIndex = navItems.length - 1;
-    } else {
-      // Try to determine the best element
-      currentActiveIndex = navItems.findIndex((item) => item.targetElement.offsetTop + navbarHeight > window.scrollY) - 1;
     }
     navItems.forEach((item) => item.navElement.classList.remove("current"));
     navItems[currentActiveIndex].navElement.classList.add("current");

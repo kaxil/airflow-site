@@ -66,10 +66,84 @@
   border-radius: 4px;
 }
 
+// A link in running text: link colour, with a faint underline that darkens on hover.
+@mixin text-link {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
+  text-underline-offset: 3px;
+
+  &:hover { text-decoration-color: currentcolor; }
+}
+
 // The mono uppercase label (section eyebrows, footer headings, diagram layers).
 @mixin label {
   font: 500 12px/16px var(--mono);
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--dim);
+}
+
+// Syntax colours for Chroma's CSS classes (Hugo's highlighter), for code samples in windows
+// and code blocks in Markdown alike.
+@mixin chroma-tokens {
+  .k,
+  .kn,
+  .kc,
+  .kd,
+  .kp,
+  .kr,
+  .ow,
+  .nt,
+  .gh,
+  .gu { color: var(--tok-kw); }
+
+  .s,
+  .s1,
+  .s2,
+  .sa,
+  .sb,
+  .sc,
+  .sd,
+  .se,
+  .sh,
+  .si,
+  .sr,
+  .sx,
+  .dl { color: var(--tok-str); }
+
+  .nd { color: var(--tok-dec); }
+
+  .nf,
+  .fm,
+  .na { color: var(--tok-fn); }
+
+  .nc,
+  .nb,
+  .bp,
+  .kt { color: var(--tok-ty); }
+
+  .c,
+  .c1,
+  .ch,
+  .cm,
+  .cp,
+  .cs,
+  .gp {
+    color: var(--tok-cm);
+    font-style: italic;
+  }
+
+  .m,
+  .mb,
+  .mf,
+  .mh,
+  .mi,
+  .il,
+  .mo,
+  .no { color: var(--tok-num); }
+
+  .gd { color: var(--red-2); }
+
+  .gi { color: var(--green-2); }
 }

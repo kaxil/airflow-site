@@ -70,6 +70,7 @@ function makeIndex(posts) {
     this.field("title");
     this.field("description");
     this.field("author");
+    this.field("authors", {extractor: (p) => (p.authors || []).map((a) => a.name).join(" ")});
     this.field("content");
     this.field("tags");
     this.field("url");
@@ -98,7 +99,6 @@ async function processLanguage(language) {
     await fs.mkdir(currentOutputDirectory);
   }
   await writeJson(`${currentOutputDirectory}/blog-index.json`, index);
-  await writeJson(`${currentOutputDirectory}/blog-posts.json`, posts);
 }
 
 async function run() {

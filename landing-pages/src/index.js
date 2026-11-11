@@ -19,39 +19,24 @@
 
 import {shuffleNodeChildren} from "./js/committersList";
 import {showMore} from "./js/showMore";
-import {handleActiveVideo} from "./js/handleActiveVideo";
-import "./js/navbarScroll";
-import "./js/drawer";
-import "./js/contentDrawer";
 import "./js/progressTracking";
-import "./js/rating";
-import "./js/makeTableResponsive";
-import "./js/detailsTabs";
-import "./js/versionSelector";
-import "./js/scrollToTop";
 
-if (document.querySelector("#search")) {
+// The blog's search box submits to /blog/?q=..., the only page that runs a search.
+if (window.location.pathname === "/blog/" && (new URLSearchParams(window.location.search).get("q") || "").trim()) {
   import(/* webpackChunkName: "search" */ "./js/searchBlogPosts");
+}
+
+if (document.querySelector(".meetups")) {
+  import("./js/meetupsList.js");
+}
+
+if (document.querySelector("details[data-tab]")) {
+  import("./js/detailsTabs");
 }
 
 shuffleNodeChildren("#committers-container");
 shuffleNodeChildren("#pmc-container");
 
-showMore("#committers-container", "#show-more-committers", 4);
-showMore("#pmc-container", "#show-more-pmcs", 4);
-showMore("#committers-container-no-desktop", "#show-more-committers-no-desktop", 4);
-showMore("#pmc-container-no-desktop", "#show-more-pmcs-no-desktop", 4);
-showMore(
-  "#testimonials-container",
-  "#show-more-testimonials",
-  4);
-
-handleActiveVideo();
-
-if (document.querySelector("#header")) {
-  import(/* webpackChunkName: "header" */ "./js/headerAnimation").then((module) => {
-    module.initHeaderAnimation();
-  });
-}
-import("./js/integrationList.js");
-import("./js/meetupsList.js");
+showMore("#committers-container", "#show-more-committers", 12);
+showMore("#pmc-container", "#show-more-pmcs", 12);
+showMore("#testimonials-container", "#show-more-testimonials", 4);

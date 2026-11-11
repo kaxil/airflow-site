@@ -17,9 +17,55 @@
  under the License.
 */}}
 
+{{- /*
+  A use case or a case study, e.g. /use-cases/adobe/. A use case's content opens with its
+  own h1 ("Use Airflow for ..."), which becomes the page header's title. A case study shows
+  the company's logo in the header and its quote beside the Q&A.
+*/ -}}
 {{ define "main" }}
-<div class="case-study-page no-width-restriction">
-  {{ .Render "content" }}
-  {{ partial "pager.html" . }}
-</div>
+{{- $content := string .Content -}}
+{{- $title := .Title -}}
+{{- with findRESubmatch `\A\s*<h1[^>]*>([\s\S]*?)</h1>` $content 1 -}}
+  {{- $title = index . 0 1 | plainify | htmlUnescape | strings.TrimSpace -}}
+  {{- $content = replaceRE `\A\s*<h1[^>]*>[\s\S]*?</h1>` "" $content 1 -}}
+{{- end }}
+{{- $quote := .Params.quote }}
+<section class="page-head uc-head">
+  <div class="wrap">
+    <p class="label"><a href="{{ .CurrentSection.RelPermalink }}">{{ .CurrentSection.Title }}</a>{{ if $quote }} / Case study{{ else }} / {{ .Title }}{{ end }}</p>
+    {{- if $quote }}
+    {{ partial "site/use-cases-logo.html" (dict "params" .Params "eager" true) }}
+    {{- end }}
+    <h1>{{ $title }}</h1>
+    {{- with .Params.usecasedescription.text }}
+    <p class="lead">{{ . }}</p>
+    {{- end }}
+    {{- with .Params.description }}
+    <p class="lead">{{ . | markdownify }}</p>
+    {{- end }}
+  </div>
+</section>
+
+<section class="page-body">
+  <div class="wrap">
+    <div class="page-cols{{ if $quote }} with-aside{{ end }} uc-cols">
+      <div>
+        <div class="prose uc-prose">{{ $content | safeHTML }}</div>
+        {{ partial "site/edit-link.html" . }}
+      </div>
+      {{- with $quote }}
+      <aside class="page-aside uc-aside">
+        <figure class="uc-pull">
+          <blockquote>{{ .text }}</blockquote>
+          {{- with .author }}
+          <figcaption><b>{{ . }}</b><span class="meta">{{ $.Title }}</span></figcaption>
+          {{- end }}
+        </figure>
+      </aside>
+      {{- end }}
+    </div>
+    {{- /* Hugo's NextInSection is the page before this one in the section's list order. */}}
+    {{ partial "site/pager.html" (dict "prev" .NextInSection "next" .PrevInSection "prevLabel" "Previous" "nextLabel" "Next" "label" "More use cases") }}
+  </div>
+</section>
 {{ end }}

@@ -17,18 +17,16 @@
  under the License.
 */}}
 
-{{ $related := .Site.RegularPages.Related . | first 2 }}
-{{ with $related }}
-    <div class="blog-pager">
-        <h5 class="header__xsmall--greyish-brown">Read also</h5>
-        <div class="pager">
-            <div class="list-items">
-                {{ range . }}
-                    <div class="list-item list-item--wide">
-                        {{ partial "boxes/blogpost" . }}
-                    </div>
-                {{ end }}
-            </div>
-        </div>
-    </div>
-{{ end }}
+{{- /* "Read also": up to two related posts, under a post. Call with the post. */ -}}
+{{- with .Site.RegularPages.Related . | first 2 }}
+<section class="band post-related" aria-labelledby="related-h">
+  <div class="wrap">
+    <h2 id="related-h" class="label">Read also</h2>
+    <ul class="post-list">
+      {{- range . }}
+      <li>{{ partial "boxes/blogpost" (dict "post" . "h" 3) }}</li>
+      {{- end }}
+    </ul>
+  </div>
+</section>
+{{- end }}

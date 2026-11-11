@@ -1,0 +1,54 @@
+{{/*
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+*/}}
+{{- /*
+  The post list shared by /blog/ and the tag pages: the page header, the search box, the tag
+  filter and the post list. Call with a dict: page, lead and an optional label.
+
+  src/js/searchBlogPosts.js reads the query into #search and replaces the children of
+  .list-items with the rows of the matching posts, found by the title in
+  .box-event__blogpost--header.
+*/ -}}
+{{- $page := .page -}}
+{{ partial "site/page-head.html" (dict "page" $page "label" .label "lead" .lead) }}
+<section class="page-body blog-index">
+  <div class="wrap">
+    <div class="blog-tools">
+      <form class="search blog-search" method="get" action="{{ "blog/" | relURL }}" role="search">
+        <label for="search" class="visually-hidden">Search blog posts</label>
+        <input placeholder="Search posts" name="q" type="search" id="search">
+        <button type="submit" aria-label="Search blog posts">{{ partial "design/icon.html" "search" }}</button>
+      </form>
+      <a class="btn btn-secondary btn-sm" href="{{ site.Params.github_repo }}">Add your post</a>
+    </div>
+    <nav class="blog-filter" aria-label="Filter posts by tag">
+      <ul>
+        {{- $blog := site.GetPage "/blog" }}
+        <li><a href="{{ $blog.RelPermalink }}"{{ if eq $page $blog }} aria-current="page"{{ end }}>All</a></li>
+        {{- range site.Taxonomies.tags }}
+        <li><a href="{{ .Page.RelPermalink }}"{{ if eq $page .Page }} aria-current="page"{{ end }}>{{ .Page.LinkTitle }}<span class="n">{{ .Count }}</span></a></li>
+        {{- end }}
+      </ul>
+    </nav>
+    <ul class="post-list list-items">
+      {{- range $page.Pages }}
+      <li>{{ partial "boxes/blogpost" (dict "post" . "h" 2) }}</li>
+      {{- end }}
+    </ul>
+  </div>
+</section>

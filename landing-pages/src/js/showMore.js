@@ -28,12 +28,12 @@ export const showMore = (containerID, buttonID, maxItemsOnPage = 8) => {
   const container = window.document.querySelector(containerID);
   const button = window.document.querySelector(buttonID);
   if (!container || !button) return;
+  // The button starts hidden, so it shows only once this script runs.
   if (container.childElementCount <= maxItemsOnPage * currentPage) {
-    button.style.display = "none";
     return;
   }
 
-  button.style.display = "block";
+  button.hidden = false;
   const elements = Array.from(container.children);
   elements
     .slice(maxItemsOnPage, container.childElementCount)
@@ -45,7 +45,7 @@ export const showMore = (containerID, buttonID, maxItemsOnPage = 8) => {
     showElementsOnPage(elements, currentPage, maxItemsOnPage);
     currentPage += 1;
     if (container.childElementCount <= maxItemsOnPage * currentPage) {
-      button.style.display = "none";
+      button.hidden = true;
     }
   });
 };

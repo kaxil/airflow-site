@@ -63,6 +63,7 @@
   @include custom-properties($fixed);
 
   --acc: var(--blue);
+  --acc-text: var(--accent-blue);
   --sans: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", menlo, monospace;
   --pad: 128px;
@@ -94,9 +95,17 @@
   }
 }
 
-// Accent classes set --acc, which tabs, tags, windows and highlighted code lines use.
+// Accent classes set --acc, which tabs, tags, windows and highlighted code lines use, and
+// --acc-text for accent-coloured text. Every accent here is text-safe, so the two match; the
+// default --acc (--blue) is not, which is why --acc-text has its own default.
 .a-green { --acc: var(--green-2); }
 .a-teal { --acc: var(--teal-2); }
 .a-amber { --acc: var(--amber-2); }
 .a-red { --acc: var(--red-2); }
 .a-blue { --acc: var(--accent-blue); }
+
+.a-green,
+.a-teal,
+.a-amber,
+.a-red,
+.a-blue { --acc-text: var(--acc); }

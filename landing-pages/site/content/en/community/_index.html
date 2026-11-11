@@ -5,41 +5,38 @@ menu:
     weight: 1
 ---
 
-<div class="community--grid">
-    <div class="community--dev">
-        <div class="community--accordion-container">
-            <h3 class="community--header-persona">Want to contribute?</h3>
-            {{< accordion title="Join the Dev list" description="The Dev list is the preferred channel for announcements, proposals and votes." logo_path="icons/join-devlist-icon.svg">}}
-                <p class="bodytext__medium--brownish-grey">
+<div class="cm-groups">
+    <section class="cm-group">
+            <h3>Want to contribute?</h3>
+            {{< accordion title="Join the Dev list" description="The Dev list is the preferred channel for announcements, proposals and votes.">}}
+                <p>
                     Manage your <b>subscription</b>:
                 </p>
-                <ul class="ticks-blue mx-auto">
-                    <li class="text-break-all"><a href="mailto:dev-subscribe@airflow.apache.org">dev-subscribe@airflow.apache.org</a></li>
-                    <li class="text-break-all"><a href="mailto:dev-unsubscribe@airflow.apache.org">dev-unsubscribe@airflow.apache.org</a></li>
+                <ul>
+                    <li><a href="mailto:dev-subscribe@airflow.apache.org">dev-subscribe@airflow.apache.org</a></li>
+                    <li><a href="mailto:dev-unsubscribe@airflow.apache.org">dev-unsubscribe@airflow.apache.org</a></li>
                 </ul>
-                <p class="bodytext__medium--brownish-grey">
+                <p>
                     Browse the <b>archive</b>:
                 </p>
-                <ul class="ticks-blue mx-auto">
-                   <li class="text-break-all"><a href="https://lists.apache.org/list.html?dev@airflow.apache.org">https://lists.apache.org/list.html?dev@airflow.apache.org</a></li>
+                <ul>
+                   <li><a href="https://lists.apache.org/list.html?dev@airflow.apache.org">https://lists.apache.org/list.html?dev@airflow.apache.org</a></li>
                 </ul>
-                <p class="bodytext__medium--brownish-grey">
+                <p>
                     For answers to ad hoc questions, try asking in the official <b>Airflow Slack</b> first. See <b>"Ask a question"</b> below for details and additional resources.
                 </p>
             {{< /accordion >}}
-            {{< accordion title="Join the community on Slack" description="Connect with other contributors" logo_path="icons/ask-question-icon.svg">}}
-            <ol class="counter-blue mx-auto">
-                <p class="bodytext__medium--brownish-grey">
+            {{< accordion title="Join the community on Slack" description="Connect with other contributors">}}
+                <p>
                     After <a href="https://apache-airflow-slack.herokuapp.com/">creating an account</a>, join
                     <a href="https://apache-airflow.slack.com/messages/new-contributors">#new-contributors</a>
                     when you have questions and attempt to do your first contributions.
                     Join <a href="https://apache-airflow.slack.com/messages/contributors">#contributors</a>
                     to discuss more in depth contributing to Airflow.
                 </p>
-            </ol>
             {{< /accordion >}}
-            {{< accordion title="Improve documentation" description="Additions and improvements to the documentation are always welcome!" logo_path="icons/documentation-icon.svg" >}}
-            <ol class="counter-blue mx-auto">
+            {{< accordion title="Improve documentation" description="Additions and improvements to the documentation are always welcome!">}}
+            <ol>
                 <li>Open a PR with your changes.</li>
                 <li>
                     Feel free to ask any questions you have in the #documentation channel in <a
@@ -47,8 +44,8 @@ menu:
                 </li>
             </ol>
             {{< /accordion >}}
-            {{< accordion title="Propose fundamental changes" description="If you have an idea that will change Airflow fundamentally, then there are more steps to take, but they are rather simple." logo_path="icons/project-icon.svg" >}}
-            <ol class="counter-blue mx-auto">
+            {{< accordion title="Propose fundamental changes" description="If you have an idea that will change Airflow fundamentally, then there are more steps to take, but they are rather simple.">}}
+            <ol>
                 <li>
                     Create an Airflow Improvement Proposal (AIP) on the project wiki
                     (<a href="https://cwiki.apache.org/confluence/display/AIRFLOW/Airflow+Improvement+Proposals">Airflow
@@ -65,58 +62,54 @@ menu:
                 </li>
             </ol>
             {{< /accordion >}}
-        </div>
-    </div>
-    <div class="community--user">
-        <div class="community--accordion-container">
-            <h3 class="community--header-persona">Are you a user?</h3>
-            {{< accordion title="Join the community on Slack" description="Connect with other users, get help, exchange best practices with other users." logo_path="icons/ask-question-icon.svg">}}
-            <ol class="counter-blue mx-auto">
-                <p class="bodytext__medium--brownish-grey">
+    </section>
+    <section class="cm-group">
+            <h3>Are you a user?</h3>
+            {{< accordion title="Join the community on Slack" description="Connect with other users, get help, exchange best practices with other users.">}}
+                <p>
                     After <a href="https://apache-airflow-slack.herokuapp.com/">creating an account</a>, join
                     <a href="https://apache-airflow.slack.com/messages/user-troubleshooting">#user-troubleshooting</a>
                     to ask for help with using Airflow.
                     Consider joining <a href="https://apache-airflow.slack.com/messages/user-best-practices">#user-best-practices</a>
                     to ask about best practices with using Airflow, and to share your best practices.
                 </p>
-            </ol>
             {{< /accordion >}}
-            {{< accordion title="Join the Users mailing list" description="The Users list is the preferred channel for important announcements: release and security and asking for help from other users." logo_path="icons/join-devlist-icon.svg">}}
-            <p class="bodytext__medium--brownish-grey">
+            {{< accordion title="Join the Users mailing list" description="The Users list is the preferred channel for important announcements: release and security and asking for help from other users.">}}
+            <p>
                 Manage your <b>subscription</b>:
             </p>
-            <ul class="ticks-blue mx-auto">
-                <li class="text-break-all"><a href="mailto:users-subscribe@airflow.apache.org">users-subscribe@airflow.apache.org</a></li>
-                <li class="text-break-all"><a href="mailto:users-unsubscribe@airflow.apache.org">users-unsubscribe@airflow.apache.org</a></li>
+            <ul>
+                <li><a href="mailto:users-subscribe@airflow.apache.org">users-subscribe@airflow.apache.org</a></li>
+                <li><a href="mailto:users-unsubscribe@airflow.apache.org">users-unsubscribe@airflow.apache.org</a></li>
             </ul>
-            <p class="bodytext__medium--brownish-grey">
+            <p>
                 Browse the <b>archive</b>:
             </p>
-            <ul class="ticks-blue mx-auto">
-                <li class="text-break-all"><a href="https://lists.apache.org/list.html?users@airflow.apache.org">https://lists.apache.org/list.html?users@airflow.apache.org</a></li>
+            <ul>
+                <li><a href="https://lists.apache.org/list.html?users@airflow.apache.org">https://lists.apache.org/list.html?users@airflow.apache.org</a></li>
             </ul>
-            <p class="bodytext__medium--brownish-grey">
+            <p>
                 For answers to ad hoc questions, try asking in the official <b>Airflow Slack</b> first. See <b>"Ask a question"</b> below for details and additional resources.
             </p>
             {{< /accordion >}}
-            {{< accordion title="Ask a question" description="Reach out to other users and contributors. There are at least three ways to do this." logo_path="icons/ask-question-icon.svg">}}
-            <ol class="counter-blue mx-auto">
+            {{< accordion title="Ask a question" description="Reach out to other users and contributors. There are at least three ways to do this.">}}
+            <ol>
                 <li>Ask in the <a href="https://apache-airflow-slack.herokuapp.com/">Apache Airflow Slack</a></li>
                 <li>Search <a href="https://stackoverflow.com/questions/tagged/airflow">Stack Overflow</a></li>
                 <li>Ask on the <a href="mailto:users-subscribe@airflow.apache.org">Users list</a><small> (or<a href="mailto:users-unsubscribe@airflow.apache.org"> unsubscribe)</a></small></li>
             </ol>
             {{< /accordion >}}
-            {{< accordion title="Start a discussion" description="Use a [GitHub Discussion](https://github.com/apache/airflow/discussions) to start a discussion." logo_path="icons/ask-question-icon.svg" >}}
-            <p class="bodytext__medium--brownish-grey">You can start discussions about:</p>
-            <ul class="ticks-blue mx-auto">
+            {{< accordion title="Start a discussion" description="Use a [GitHub Discussion](https://github.com/apache/airflow/discussions) to start a discussion.">}}
+            <p>You can start discussions about:</p>
+            <ul>
                 <li>proposing a new feature</li>
                 <li>whether what you are observing is a real issue</li>
                 <li>your brainstorms</li>
                 <li>how others solve their problems.</li>
             </ul>
             {{< /accordion >}}
-            {{< accordion title="Propose a new feature" description="Two steps are required to create a feature request in Airflow." logo_path="icons/new-feature-icon.svg" >}}
-            <ol class="counter-blue mx-auto">
+            {{< accordion title="Propose a new feature" description="Two steps are required to create a feature request in Airflow.">}}
+            <ol>
                 <li>Create an account on <a href="https://github.com">GitHub</a></li>
                 <li>
                     Create a <a href="https://github.com/apache/airflow/issues/new/choose">new issue</a> and choose ‘Feature request’. Try to include as much information as you can in the description.
@@ -129,28 +122,27 @@ menu:
                 </li>
             </ol>
             {{< /accordion >}}
-            {{< accordion title="Report a bug" description="Use a [GitHub Issue](https://github.com/apache/airflow/issues) to create an issue." logo_path="icons/bug-icon.svg" >}}
-            <p class="bodytext__medium--brownish-grey">Remember to include as much information as you can, including:</p>
-            <ul class="ticks-blue mx-auto">
+            {{< accordion title="Report a bug" description="Use a [GitHub Issue](https://github.com/apache/airflow/issues) to create an issue.">}}
+            <p>Remember to include as much information as you can, including:</p>
+            <ul>
                 <li>tracebacks</li>
                 <li>screencaps</li>
                 <li>context for reproducing the problem (mandatory).</li>
             </ul>
-            <p class="bodytext__medium--brownish-grey">
+            <p>
                 You are also encouraged to open a PR with your bug fix. Take a
                 look at our
                 <a href="https://github.com/apache/airflow/blob/master/CONTRIBUTING.rst">contribution guidelines</a>
                 to learn more about contributing.
             </p>
-            <p class="bodytext__medium--brownish-grey">
+            <p>
                 If you are unsure if you are encountering a problem with Airflow, start a
                 <a href="https://github.com/apache/airflow/discussions">GitHub Discussion</a> first.
             </p>
-            <p class="bodytext__medium--brownish-grey">
+            <p>
                 If you want to raise a security issue, please take a look into the
                 <a href="https://github.com/apache/airflow/security/policy">Airflow security policy</a> first.
             </p>
             {{< /accordion >}}
-        </div>
-    </div>
+    </section>
 </div>

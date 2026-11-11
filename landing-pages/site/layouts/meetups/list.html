@@ -1,87 +1,96 @@
 {{/*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
 */}}
-
+{{- /*
+  /meetups/: the meetup groups from static/meetups.json, talks from data/videos.json, and
+  how to host a meetup. src/js/meetupsList.js (the webpack bundle) filters the groups as the
+  reader types in the search box and pages them with the .more button.
+*/ -}}
 {{ define "main" }}
-    <h1 class="page-header">Meetups</h1>
-    <p class="meetups-page page-subtitle">
-        Meetups are a great way for the community to meet face-to-face
-    </p>
-    <div class="meetups">
-        <script type="application/x-template" id="meetup-template">
-            <div class="list-item">
-                <div class="card">
-                    <div class="box-event">
-                        <p class="box-event__meetup--location" data-name="location"></p>
-                        <p class="box-event__meetup--members">
-                            {{ with resources.Get "icons/members-icon.svg" }}
-                                {{ .Content | safeHTML }}
-                            {{ end }}
-                            <span data-name="members-count"></span>
-                        </p>
-                        <a href="" class="btn-hollow btn-blue bodytext__medium--cerulean-blue">Learn more</a>
-                    </div>
-                </div>
-            </div>
-        </script>
-        <div class="search-form">
-            <label for="search" class="visually-hidden">Search meetups by country or city</label>
-            <input class="search-form__input" placeholder="Country or city" type="search" id="search" size="16">
-            <button class="search-form__button" type="button" aria-label="Search meetups">
-                {{ with resources.Get "icons/search-icon.svg" }}
-                    {{ .Content | safeHTML }}
-                {{ end }}
-            </button>
-        </div>
-        <div id="events-container" class="list-items">
-            {{ range .Site.Data.meetups }}
-                <div class="list-item">
-                    {{ partial "boxes/event" . }}
-                </div>
-            {{ end }}
-        </div>
-        <div>
-            {{ partial "buttons/button-filled" (dict "text" "Show more" "class" "more") }}
-        </div>
+{{ partial "site/page-head.html" (dict "page" . "lead" "Meetups are a great way for the community to meet face-to-face") }}
+{{- $meetups := readFile "static/meetups.json" | transform.Unmarshal }}
+<section class="page-body" aria-labelledby="mt-groups-h">
+  <div class="wrap meetups">
+    <div class="mt-head">
+      <h2 class="visually-hidden" id="mt-groups-h">Meetup groups</h2>
+      <div class="search mt-search">
+        <label for="search" class="visually-hidden">Search meetups by country or city</label>
+        {{ partial "design/icon.html" "search" }}
+        <input type="search" id="search" placeholder="Country or city" autocomplete="off" aria-controls="events-container">
+      </div>
+      <p class="meta">{{ len $meetups }} groups worldwide</p>
     </div>
-    <div class="video-section-container no-width-restriction">
-        {{ partial "video-section" . }}
-    </div>
-    <div>
-        <h2 class="page-header host-header">Want to host a meetup?</h2>
-        <div>
-            Meetups related to the Apache Airflow project are held across the globe, thanks to community volunteers. Interested individuals are encouraged to host community meetups using the name Apache Airflow Meetup <geographical location> in compliance with Apache Software Foundation's branding and trademarks guidelines. No explicit PMC approval is required but also, PMC does not endorse the organizers or communities that organize it.
-            <p/><p/>
-            Hosts are required to ensure that:
+    <ul id="events-container" class="cards list-items mt-grid">
+      {{- range $meetups }}
+      {{ partial "boxes/event.html" . }}
+      {{- end }}
+    </ul>
+    <p class="mt-empty" hidden>No meetup groups match.</p>
+    <div class="more-row"><button class="btn btn-secondary more" type="button" hidden>Show more</button></div>
+  </div>
+</section>
 
-            <ul>
-                <li>The Apache Airflow ecosystem should be championed in every meetup and technical session</li>
-                <li>All talks should be vendor-neutral and not sales pitches</li>
-                <li>Each meetup should strive to have at least two talks with speakers representing different companies/organizations if possible to foster neutrality</li>
-                <li>Planned meetups should be brought to the attention of the Airflow dev mailing list</li>
-                <li>All Community Guidelines must be respected including the <a href="https://airflow.apache.org/code-of-conduct/">Code of conduct</a></li>
-            </ul>
-        </div>
-        <div class="text-with-icon-list">
-            {{ partial "text-with-icon" (dict "logo_path" "icons/meetup-icon.svg" "header" "Create an event" "text" "Create an event using meetup.com or Facebook and recruit some interesting speakers. Drinks and snacks are always nice.") }}
-            {{ partial "text-with-icon" (dict "logo_path" "icons/intent-icon.svg" "header" "Voice your intent" "text" "In describing your event, remember to specify the intended audience -- e.g., beginners, intermediates, developers, or architects.") }}
-            {{ partial "text-with-icon" (dict "logo_path" "icons/date-icon.svg" "header" "Select a date" "text" "Choosing the right day and time is essential for a good turnout. Midweek in the evening tends to work best. ") }}
-            {{ partial "text-with-icon" (dict "logo_path" "icons/promote-icon.svg" "header" "Promote it!" "text" "Publicize your meetup as widely as possible! Reach out to the community team, and we will publish your event in the [#announcements](https://apache-airflow.slack.com/messages/announcements) channel.") }}
-        </div>
+{{- with sort site.Data.videos "date" "desc" }}
+<section class="band" aria-labelledby="mt-videos-h">
+  <div class="wrap">
+    <h2 class="h-section" id="mt-videos-h">Talks to watch</h2>
+    <ul class="cards mt-videos">
+      {{- range . }}
+      <li id="{{ .videoID }}">
+        <a class="mt-video" href="https://www.youtube.com/watch?v={{ .videoID }}">
+          <img src="/meetups-video-placeholders/{{ .videoID }}.png" alt="" width="560" height="315" loading="lazy">
+          <b>{{ .title }}</b>
+          <span class="tlink">Watch on YouTube {{ partial "design/icon.html" "arrow" }}</span>
+        </a>
+      </li>
+      {{- end }}
+    </ul>
+  </div>
+</section>
+{{- end }}
+
+<section aria-labelledby="mt-host-h">
+  <div class="wrap">
+    <h2 class="h-section" id="mt-host-h">Want to host a meetup?</h2>
+    <div class="prose">
+      <p>Meetups related to the Apache Airflow project are held across the globe, thanks to community volunteers. Interested individuals are encouraged to host community meetups using the name Apache Airflow Meetup &lt;geographical location&gt; in compliance with Apache Software Foundation's branding and trademarks guidelines. No explicit PMC approval is required but also, PMC does not endorse the organizers or communities that organize it.</p>
+      <p>Hosts are required to ensure that:</p>
+      <ul>
+        <li>The Apache Airflow ecosystem should be championed in every meetup and technical session</li>
+        <li>All talks should be vendor-neutral and not sales pitches</li>
+        <li>Each meetup should strive to have at least two talks with speakers representing different companies/organizations if possible to foster neutrality</li>
+        <li>Planned meetups should be brought to the attention of the Airflow dev mailing list</li>
+        <li>All Community Guidelines must be respected including the <a href="https://airflow.apache.org/code-of-conduct/">Code of conduct</a></li>
+      </ul>
     </div>
+    <ol class="mt-steps">
+      {{- range slice
+        (slice "Create an event" "Create an event using meetup.com or Facebook and recruit some interesting speakers. Drinks and snacks are always nice.")
+        (slice "Voice your intent" "In describing your event, remember to specify the intended audience -- e.g., beginners, intermediates, developers, or architects.")
+        (slice "Select a date" "Choosing the right day and time is essential for a good turnout. Midweek in the evening tends to work best.")
+        (slice "Promote it!" "Publicize your meetup as widely as possible! Reach out to the community team, and we will publish your event in the [#announcements](https://apache-airflow.slack.com/messages/announcements) channel.") }}
+      <li class="card">
+        <h3>{{ index . 0 }}</h3>
+        <p>{{ index . 1 | markdownify }}</p>
+      </li>
+      {{- end }}
+    </ol>
+    {{ partial "site/edit-link.html" . }}
+  </div>
+</section>
 {{ end }}

@@ -16,44 +16,36 @@
  specific language governing permissions and limitations
  under the License.
 */}}
+{{- /*
+  A blog post as a row of the post list, for /blog/, the tag pages and "Read also": the date
+  and authors, then the title, description and tags. Call with a dict: post (the page) and h
+  (the title's heading level, 2 or 3). The title's link covers the row (.card-link).
 
-<div class="card">
-    <div class="box-event__blogpost">
-        <div class="box-event__blogpost--metadata">
-            <div class="tags-container">
-                {{ range $tag := .Params.tags }}
-                    {{ with $.Site.GetPage (printf "/tags/%s" $tag) }}
-                        <a class="tag" href="{{ .Permalink }}">{{ humanize $tag }}</a>
-                    {{ end }}
-                {{ end }}
-            </div>
-            <span class="bodytext__medium--brownish-grey box-event__blogpost--date">{{ .Date.Format "Mon, Jan 2, 2006" }}</span>
-        </div>
-        <p class="box-event__blogpost--header">
-            <a href="{{ .RelPermalink }}">
-                {{ .Params.title }}
-            </a>
-        </p>
-        {{ if .Params.authors }}
-        <p class="box-event__blogpost--author">
-          {{ $total := len .Params.authors }}
-          {{ range $index, $a := .Params.authors }}
-            {{ if $a.linkedin }}
-              <a href="https://linkedin.com/in/{{ $a.linkedin }}" target="_blank" rel="noopener">{{ $a.name }}</a>
-            {{ else if $a.github }}
-              <a href="https://github.com/{{ $a.github }}" target="_blank" rel="noopener">{{ $a.name }}</a>
-            {{ else }}
-              {{ $a.name }}
-            {{ end }}
-            {{ if lt (add $index 1) $total }}, {{ end }}
-          {{ end }}
-        </p>
-        {{ else if .Params.author }}
-            <p class="box-event__blogpost--author">{{ .Params.author }}</p>
-        {{ end }}
-        <p class="box-event__blogpost--description">{{ .Params.description }}</p>
-        <div class="mt-auto">
-            <a href="{{ .RelPermalink }}" class="btn-hollow btn-blue bodytext__medium--cerulean-blue">Read more</a>
-        </div>
+  src/js/searchBlogPosts.js finds a post's row by the text of .box-event__blogpost--header.
+*/ -}}
+{{- $post := .post -}}
+{{- $h := .h | default 2 -}}
+<article class="post-row card-link">
+  <div class="box-event__blogpost">
+    <p class="meta post-row-meta">
+      <time class="box-event__blogpost--date" datetime="{{ $post.Date.Format "2006-01-02" }}">{{ $post.Date.Format "Jan 2, 2006" }}</time>
+      <span class="box-event__blogpost--author">
+        {{- range $i, $a := partial "site/blog-authors.html" $post -}}
+          {{- if $i }}, {{ end -}}
+          {{- if $a.linkedin -}}<a href="https://linkedin.com/in/{{ $a.linkedin }}/">{{ $a.name }}</a>
+          {{- else if $a.github -}}<a href="https://github.com/{{ $a.github }}/">{{ $a.name }}</a>
+          {{- else -}}{{ $a.name }}{{- end -}}
+        {{- end -}}
+      </span>
+    </p>
+    <h{{ $h }} class="post-row-title"><a class="box-event__blogpost--header card-target" href="{{ $post.RelPermalink }}">{{ $post.Title }}</a></h{{ $h }}>
+    <p class="box-event__blogpost--description">{{ with $post.Description }}{{ . }}{{ else }}{{ $post.Summary | plainify | truncate 160 }}{{ end }}</p>
+  </div>
+  <div class="box-event__blogpost--metadata">
+    <div class="tags-container">
+      {{- range $post.GetTerms "tags" }}
+      <a class="tag a-blue" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+      {{- end }}
     </div>
-</div>
+  </div>
+</article>

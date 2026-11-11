@@ -16,17 +16,71 @@
  specific language governing permissions and limitations
  under the License.
 */}}
-
+{{- /*
+  A post: the header, the body, the share and edit links, links to the posts either side,
+  and related posts.
+*/ -}}
 {{ define "main" }}
-    <div class="blogpost-content">
-        {{ .Render "content" }}
+<header class="page-head post-head">
+  <div class="wrap">
+    <p class="label"><a href="{{ "blog/" | relURL }}">Blog</a></p>
+    <h1>{{ .Title }}</h1>
+    {{- with .Description }}
+    <p class="lead">{{ . }}</p>
+    {{- end }}
+    <div class="post-byline">
+      <time class="meta" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+      {{- with partial "site/blog-authors.html" . }}
+      <ul class="post-authors" aria-label="Authors">
+        {{- range . }}
+        {{- $name := .name }}
+        <li>
+          <span>{{ $name }}</span>
+          {{- with .github }}
+          <a href="https://github.com/{{ . }}/" aria-label="GitHub profile of {{ $name }}">{{ partial "design/icon.html" "github" }}</a>
+          {{- end }}
+          {{- with .linkedin }}
+          <a href="https://linkedin.com/in/{{ . }}/" aria-label="LinkedIn profile of {{ $name }}">{{ partial "design/icon.html" "linkedin" }}</a>
+          {{- end }}
+        </li>
+        {{- end }}
+      </ul>
+      {{- end }}
+      {{- with .GetTerms "tags" }}
+      <div class="tags-container">
+        {{- range . }}
+        <a class="tag a-blue" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+        {{- end }}
+      </div>
+      {{- end }}
+    </div>
+  </div>
+</header>
+{{- /* A table of contents beside a post with more than one section: its top two heading
+  levels, since some posts use h1 for sections and others h2. */}}
+{{- $top := cond (findRE `<h1 id=` .Content 1) 1 2 }}
+{{- $toc := .Fragments.ToHTML $top (add $top 1) false }}
+{{- $hasToc := gt (len (findRE `<li>` $toc 2)) 1 }}
+<section class="page-body post-body">
+  <div class="wrap page-cols{{ if $hasToc }} with-aside{{ end }}">
+    <div class="post-main">
+      <div class="prose">{{ .Content }}</div>
+      <div class="post-foot">
         {{ partial "share-social-media.html" . }}
-        <div class="no-width-restriction no-desktop">
-            {{ partial "pager.html" . }}
-        </div>
+        {{ partial "site/edit-link.html" . }}
+      </div>
+      {{- /* In Hugo, PrevInSection is the older post and NextInSection the newer one. */}}
+      {{ partial "site/pager.html" (dict "prev" .PrevInSection "next" .NextInSection "prevLabel" "Older post" "nextLabel" "Newer post" "label" "More posts") }}
     </div>
-
-    <div class="no-width-restriction desktop-only">
-        {{ partial "blog-pager" . }}
-    </div>
+    {{- if $hasToc }}
+    <aside class="page-aside post-aside">
+      <nav class="toc wy-nav-side-toc" aria-labelledby="toc-h">
+        <p class="label" id="toc-h">On this page</p>
+        {{ $toc | replaceRE `<nav id="TableOfContents">\s*|\s*</nav>\s*\z` "" | safeHTML }}
+      </nav>
+    </aside>
+    {{- end }}
+  </div>
+</section>
+{{ partial "blog-pager.html" . }}
 {{ end }}

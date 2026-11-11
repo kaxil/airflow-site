@@ -3,28 +3,17 @@ title: "ETL/ELT"
 linkTitle: "ETL/ELT"
 usecasedescription:
     text: "Airflow is the open source standard for orchestrating ETL/ELT data pipelines."
-logo: "etl.png"
 blocktype: use-case
 ---
 
-<div style="display: flex; justify-content: center; align-items: center;">
-
 # Use Airflow for ETL/ELT pipelines
-
-</div>
 
 Extract-Transform-Load (ETL) and Extract-Load-Transform (ELT) data pipelines are the most common use case for Apache Airflow. 90% of respondents in the 2023 Apache Airflow survey are using Airflow for ETL/ELT to power analytics use cases.
 
 The video below shows a simple ETL/ELT pipeline in Airflow that extracts climate data from a CSV file, as well as weather data from an API, runs transformations and then loads the results into a database to power a dashboard.
 
 
-<div id="videoContainer" style="display: flex; justify-content: center; align-items: center; border: 2px solid #ccc; width: 75%; margin: auto; padding: 20px;">
-    <a href="https://www.youtube.com/embed/ljBU_VyihVQ?autoplay=1">
-        <img id="videoPlaceholder" src="/usecase-video-placeholders/placeholder_etl_video.png" style="cursor: pointer; width: 100%; max-width: 560px;" alt="Click to play a one minute video showing the use case" title="Click to play video"/>
-    </a>
-</div>
-
-</br>
+{{< usecase-video id="ljBU_VyihVQ" placeholder="placeholder_etl_video.png" >}}
 
 ## Why use Airflow for ETL/ELT pipelines?
 

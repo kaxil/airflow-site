@@ -16,31 +16,23 @@
  specific language governing permissions and limitations
  under the License.
 */}}
-
-{{ $image := .image | default "/images/committer-placeholder.svg"}}
-<div class="card">
-    <div class="box-event">
-        <img src="{{ $image }}" alt="Committer {{ .name }}" class="avatar"/>
-        <p class="box-event__committer--nick">@{{ .nick }}</p>
-        <p class="bodytext__medium--brownish-grey">{{ .name }}</p>
-        {{ $name := .name }}
-        <div class="box-event__committer--social-media-container">
-            {{ if .github }}
-                {{ $url := .github }}
-                {{ with resources.Get "icons/github.svg" }}
-                    <a href="{{ $url }}" class="box-event__committer--social-media-icon" aria-label="{{ $name }} on GitHub">
-                        {{ .Content | safeHTML }}
-                    </a>
-                {{ end }}
-            {{ end }}
-            {{ if .linkedin }}
-                {{ $url := .linkedin }}
-                {{ with resources.Get "icons/linkedin.svg" }}
-                    <a href="{{ $url }}" class="box-event__committer--social-media-icon" aria-label="{{ $name }} on LinkedIn">
-                        {{ .Content | safeHTML }}
-                    </a>
-                {{ end }}
-            {{ end }}
-        </div>
-    </div>
-</div>
+{{- /*
+  One person in the PMC or committer list on /community/: avatar, name and GitHub handle.
+  The name links to their GitHub profile, and the link covers the whole card (.card-link).
+  Call with an entry from data/pmc.json or data/committers.json.
+*/ -}}
+{{- $profile := .github | default .linkedin }}
+<li class="cm-person card-link">
+  <img class="cm-avatar" src="{{ .image | default "/images/committer-placeholder.svg" }}" alt="" width="48" height="48" loading="lazy">
+  <span class="cm-person-t">
+    {{- if $profile }}
+    <a class="cm-person-name card-target" href="{{ $profile }}">{{ .name }}<span class="visually-hidden"> on {{ if .github }}GitHub{{ else }}LinkedIn{{ end }}</span></a>
+    {{- else }}
+    <b class="cm-person-name">{{ .name }}</b>
+    {{- end }}
+    <span class="meta">@{{ .nick }}</span>
+  </span>
+  {{- if and .github .linkedin }}
+  <a class="cm-person-in" href="{{ .linkedin }}">LinkedIn<span class="visually-hidden"> profile of {{ .name }}</span></a>
+  {{- end }}
+</li>

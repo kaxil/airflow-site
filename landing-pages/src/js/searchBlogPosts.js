@@ -19,72 +19,67 @@
 
 import lunr from "lunr";
 
-const query = new URLSearchParams(window.location.search);
-const searchString = query.get("q");
-document.querySelector("#search").value = searchString;
+// Blog search on /blog/?q=...: finds the matching posts in the lunr index that
+// create-index.js builds, and shows their rows from the server-rendered list, best match
+// first. The index refers to each post by its title.
+const MAX_RESULTS = 10;
 
-if (window.location.pathname.startsWith("/blog") && searchString) {
-  const $target = document.querySelector(".list-items");
-  const $itemTemplate = $target.firstElementChild.cloneNode(true);
+const showMessage = (list, text) => {
+  const item = document.createElement("li");
+  item.className = "post-list-msg";
+  item.textContent = text;
+  list.replaceChildren(item);
+};
 
-  const formatDate = (date) => {
-    const dateOptions = {weekday: "short", year: "numeric", month: "short", day: "numeric"};
-    return new Date(date).toLocaleDateString("en-US", dateOptions);
-  };
-
-  const setTags = (tagsContainer, tags) => {
-    while (tagsContainer.firstChild) {
-      tagsContainer.removeChild(tagsContainer.firstChild);
+const search = (index, query) => {
+  try {
+    return index.search(query);
+  } catch (error) {
+    if (!(error instanceof lunr.QueryParseError)) {
+      throw error;
     }
-    tags.forEach((tag) => {
-      const tagElement = document.createElement("a");
-      tagsContainer.appendChild(tagElement);
-      tagElement.setAttribute("class", "tag");
-      tagElement.setAttribute("href", `/blog/tags/${tag}/`);
-      tagElement.innerText = tag;
-    });
-  };
+    // lunr can't parse the query, for example one with a colon (its field separator):
+    // search for the words.
+    return index.search(query.replace(/[:^~+*-]/g, " "));
+  }
+};
 
-  Promise.all([
-    fetch("/_gen/indexes/en/blog-index.json"),
-    fetch("/_gen/indexes/en/blog-posts.json")
-  ]).then(function([indexResp, postsResp]) {
-    return Promise.all([
-      indexResp.json(),
-      postsResp.json()
-    ]);
-  }).then(function([index, posts]) {
-    const lunrIndex = lunr.Index.load(index);
-    const matches = lunrIndex.search(searchString);
-    const results = [];
-    matches.forEach(function(match) {
-      posts.filter((post) => post.title === match.ref)
-        .forEach((post) => {
-          results.push({post, match});
-        });
-    });
-    results.sort((a, b) => a.match.score - b.match.score);
+const runSearch = () => {
+  const searchBox = document.querySelector("#search");
+  const list = document.querySelector(".list-items");
+  if (!searchBox || !list) {
+    return;
+  }
+  const query = new URLSearchParams(window.location.search).get("q");
+  searchBox.value = query;
 
-    if (results.length > 10) {
-      results.splice(10, results.length - 10);
-    }
+  const rowsByTitle = new Map(Array.from(list.children).map((row) => [
+    row.querySelector(".box-event__blogpost--header").textContent.trim(),
+    row,
+  ]));
 
-    if (results.length > 0) {
-      while ($target.firstChild) {
-        $target.removeChild($target.firstChild);
+  fetch("/_gen/indexes/en/blog-index.json")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Blog search index: HTTP ${response.status}`);
       }
-      results.forEach((result) => {
-        const $newResultItem = $itemTemplate.cloneNode(true);
-        $newResultItem.querySelector(".box-event__blogpost--header").innerText = result.post.title;
-        $newResultItem.querySelector(".box-event__blogpost--author").innerText = result.post.author;
-        $newResultItem.querySelector(".box-event__blogpost--description").innerText = result.post.description;
-        $newResultItem.querySelector(".box-event__blogpost--date").innerText = formatDate(result.post.date);
-        setTags($newResultItem.querySelector(".box-event__blogpost--metadata > .tags-container"), Object.hasOwn(result.post, "tag") ? result.post.tag : []);
-        $newResultItem.querySelectorAll(".box-event__blogpost a").forEach((e) => e.href = `/blog/${result.post.url}/`);
-        $target.append($newResultItem);
-      });
-    } else {
-      $target.innerHTML = "<div>No search results found</div>";
-    }
-  });
-}
+      return response.json();
+    })
+    .then((index) => {
+      const rows = search(lunr.Index.load(index), query)
+        .map((match) => rowsByTitle.get(match.ref))
+        .filter(Boolean)
+        .slice(0, MAX_RESULTS);
+      if (rows.length > 0) {
+        list.replaceChildren(...rows);
+      } else {
+        showMessage(list, "No search results found");
+      }
+    })
+    .catch((error) => {
+      showMessage(list, "Search isn't available right now.");
+      throw error;
+    });
+};
+
+runSearch();

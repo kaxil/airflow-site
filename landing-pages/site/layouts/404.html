@@ -16,12 +16,18 @@
  specific language governing permissions and limitations
  under the License.
 */}}
-
+{{- /* The page for a URL that doesn't exist. */ -}}
 {{ define "main" }}
-    <div class="four-oh-four">
-        <div class="four-oh-four__text-container">
-            <h1>404</h1>
-            <h3><a href="{{ "/" | relURL }}">Go Home</a></h3>
-        </div>
+<section class="page-head nf-head">
+  <div class="wrap">
+    <p class="label">Page not found</p>
+    <h1>404</h1>
+    <p class="lead">There is nothing at this address. It may have moved, or the link may be mistyped.</p>
+    <div class="nf-actions">
+      <a class="btn btn-primary" href="{{ "/" | relURL }}">Go Home</a>
+      <a class="btn btn-secondary" href="{{ "docs/" | relURL }}">Documentation</a>
+      <a class="btn btn-secondary" href="{{ "blog/" | relURL }}">Blog</a>
     </div>
+  </div>
+</section>
 {{ end }}

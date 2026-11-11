@@ -1,0 +1,442 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+// Page layout shared by every non-home page: the page header, the content column, cards, the
+// pager, and the small pieces more than one section uses. Section partials build on these.
+
+// Widths and breakpoints the section partials share.
+$measure: 760px;      // a column of running text
+$lead-measure: 720px; // a lead paragraph
+$nav-offset: 96px;    // clears the sticky nav for sticky asides
+$tablet: 1023px;
+$phone: 760px;
+$small: 560px;
+
+.page-head {
+  padding: 96px 0 48px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-raise);
+
+  h1 {
+    max-width: 880px;
+    font-size: 56px;
+    line-height: 60px;
+  }
+
+  .label { margin: 0 0 16px; }
+
+  .label a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover { color: var(--text); }
+  }
+
+  .lead {
+    max-width: $lead-measure;
+    margin-top: 20px;
+  }
+}
+
+.page-body { padding: 64px 0 96px; }
+
+// A full-width band in the raised background, to set a section apart.
+.band {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-raise);
+}
+
+// A heading for a section inside a page; smaller than the kit's h2.
+.h-section {
+  margin-bottom: 32px;
+  font-size: 36px;
+  line-height: 44px;
+}
+
+// Small monospace text for dates, counts and handles.
+.meta {
+  font: 500 13px/16px var(--mono);
+  color: var(--dim);
+}
+
+// A content column with an optional sidebar on the right (a table of contents, filters).
+.page-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 48px;
+
+  &.with-aside { grid-template-columns: minmax(0, 1fr) 280px; }
+}
+
+.page-aside {
+  position: sticky;
+  top: $nav-offset;
+  align-self: start;
+}
+
+// A table of contents in a page's aside. progressTracking.js (the webpack bundle) marks the
+// entry for the section in view with .current; it reads the one in .wy-nav-side-toc.
+.toc {
+  .label { margin: 0 0 12px; }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 1px solid var(--line-2);
+  }
+
+  ul ul { border-left: 0; }
+
+  a {
+    display: block;
+    margin-left: -1px;
+    padding: 6px 0 6px 16px;
+    border-left: 2px solid transparent;
+    color: var(--dim);
+    font-size: 15px;
+    line-height: 22px;
+    text-decoration: none;
+
+    &:hover { color: var(--text); }
+  }
+
+  ul ul a {
+    padding-left: 28px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .current > a {
+    border-left-color: var(--blue-2);
+    color: var(--text);
+    font-weight: 600;
+  }
+}
+
+// A responsive grid of cards. A grid sets --card-min for narrower or wider cards.
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--card-min, 280px), 1fr));
+  gap: var(--gutter);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  color: var(--soft);
+  text-decoration: none;
+  transition: border-color .15s ease, transform .15s ease;
+
+  b,
+  h2,
+  h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 19px;
+    line-height: 26px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+  }
+
+  p { margin: 0; }
+
+  time {
+    font: 500 13px/16px var(--mono);
+    color: var(--dim);
+  }
+
+  // A "Learn more" link sits at the foot of the card.
+  .tlink {
+    margin-top: auto;
+    padding-top: 8px;
+  }
+}
+
+// A card that isn't a link itself but whose title link (.card-target) covers it. The
+// card's other links sit above that cover.
+.card-link {
+  position: relative;
+
+  a:not(.card-target) {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.card-target {
+  color: inherit;
+  text-decoration: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+  }
+
+  &:focus-visible {
+    outline: none;
+
+    &::after { outline: 2px solid var(--blue-2); }
+  }
+}
+
+a.card:hover,
+.card.card-link:hover {
+  border-color: var(--line-3);
+  transform: translateY(-2px);
+
+  .tlink .i { transform: translateX(2px); }
+}
+
+// Links to the pages either side (partials/site/pager.html).
+.pager {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gutter);
+  margin-top: 64px;
+
+  .card { gap: 4px; }
+}
+
+.pager-next {
+  grid-column: 2;
+  text-align: right;
+}
+
+// The row under a list that the webpack bundle pages through. Its button starts hidden; the
+// script shows it while there is more to show.
+.more-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+// A search field, with either an icon at the left or a submit button at the right.
+.search {
+  position: relative;
+
+  input {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--line-3);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font: 400 16px/1 var(--sans);
+    transition: border-color .15s ease;
+
+    &::placeholder {
+      color: var(--dim);
+      opacity: 1;
+    }
+
+    &:hover { border-color: var(--dim); }
+
+    &:focus-visible {
+      outline: 2px solid var(--blue-2);
+      outline-offset: 0;
+      border-color: transparent;
+    }
+
+    &:not(:last-child) { padding-right: 48px; }
+  }
+
+  > .i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    margin-top: -8px;
+    color: var(--dim);
+    pointer-events: none;
+
+    ~ input { padding-left: 40px; }
+  }
+
+  button {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    color: var(--dim);
+    cursor: pointer;
+
+    &:hover { color: var(--text); }
+  }
+}
+
+// A disclosure row from the accordion shortcode: a title and a description that open to more.
+.acc {
+  border-bottom: 1px solid var(--line);
+
+  &:first-of-type { border-top: 1px solid var(--line); }
+
+  > summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 4px;
+    border-radius: 6px;
+    list-style: none;
+    cursor: pointer;
+    transition: background-color .15s ease;
+
+    &::-webkit-details-marker { display: none; }
+
+    &:hover { background: var(--tint); }
+
+    &:focus-visible { outline-offset: -2px; }
+
+    > .i {
+      color: var(--dim);
+      transform: rotate(90deg);
+      transition: transform .15s ease, color .15s ease;
+    }
+
+    &:hover > .i { color: var(--text); }
+  }
+
+  &[open] > summary > .i { transform: rotate(-90deg); }
+}
+
+.acc-t {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  b {
+    color: var(--text);
+    font-size: 17px;
+    line-height: 24px;
+    font-weight: 600;
+  }
+
+  span {
+    color: var(--dim);
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  p { margin: 0; }
+
+  a { @include text-link; }
+}
+
+// The body is also .prose, so this is specific enough to win over _prose.scss.
+.acc > .acc-body {
+  padding: 0 4px 24px;
+  font-size: 16px;
+  line-height: 26px;
+
+  > :last-child { margin-bottom: 0; }
+
+  p,
+  ul,
+  ol { margin-bottom: 12px; }
+}
+
+.edit-link {
+  display: inline-flex;
+  color: var(--dim);
+  font-size: 14px;
+}
+
+.prose + .edit-link { margin-top: 48px; }
+
+// The 404 page.
+.nf-head {
+  padding: 120px 0;
+  border-bottom: 0;
+
+  h1 {
+    font-size: 120px;
+    line-height: 1;
+  }
+}
+
+.nf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+@media (max-width: $tablet) {
+  .page-cols.with-aside { grid-template-columns: minmax(0, 1fr); }
+
+  .page-aside { position: static; }
+}
+
+@media (max-width: $phone) {
+  .page-head {
+    padding: 56px 0 32px;
+
+    h1 {
+      font-size: 40px;
+      line-height: 44px;
+    }
+  }
+
+  .page-body { padding: 40px 0 64px; }
+
+  .h-section {
+    font-size: 28px;
+    line-height: 34px;
+  }
+
+  .nf-head {
+    padding: 72px 0;
+
+    h1 { font-size: 88px; }
+  }
+}
+
+@media (max-width: $small) {
+  .pager { grid-template-columns: minmax(0, 1fr); }
+
+  .pager-next {
+    grid-column: auto;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.card:hover,
+  .card.card-link:hover { transform: none; }
+}

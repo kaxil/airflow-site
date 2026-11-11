@@ -37,7 +37,9 @@
     <author>
       <name>Apache Airflow</name>
     </author>
-    {{- $content := replace .Content "]]>" "]]]]><![CDATA[>" -}}
+    {{- /* Copy buttons only work with the site's script. */ -}}
+    {{- $content := replaceRE `<button[^>]*\sclass="copy"[\s\S]*?</button>` "" .Content -}}
+    {{- $content = replace $content "]]>" "]]]]><![CDATA[>" -}}
     <content type="html">{{ printf "<![CDATA[%s]]>" $content | safeHTML }}</content>
   </entry>
   {{ end }}
